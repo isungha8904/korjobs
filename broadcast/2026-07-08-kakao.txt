@@ -11,40 +11,40 @@ https://github.com/isungha8904/korjobs/blob/claude/it-ai-news-curation-e99ry4/di
 1) 프론티어 모델 대전 재점화
 Claude Sonnet 5가 "에이전트형 코딩"(AI가 알아서 코드 짜고 실행)을 실무로 끌어내렸고, GPT-5.6 Sol은 터미널 작업 벤치마크 1등, Grok 4.5(1.5조 파라미터)는 SpaceX·Tesla 사내 베타 진입.
 👉 지금 쓰는 코딩 툴(코파일럿/커서)의 백엔드 모델 갈아탈 타이밍.
-https://llm-stats.com/llm-updates
+https://www.anthropic.com/news/claude-sonnet-5
 
 2) 백악관, 3사와 '모델 출시 자율표준' 막판 조율
-OpenAI·구글·앤트로픽과 규칙 협의, 다음 주 발표 가능성. 미 수출규제도 6/30 해제.
+OpenAI·구글·앤트로픽과 규칙 협의, 이번 주 발표 가능성. 새 모델 출시 전 정부가 최대 30일 안보 검토하는 구조. 미 수출규제도 6/30 해제.
 👉 모델 배포·리전 제약이 바뀌면 우리가 쓰는 API 가용성에 직접 영향.
-https://www.crescendo.ai/news/latest-ai-news-and-updates
+https://www.tipranks.com/news/white-house-races-to-finalize-ai-model-rules-with-openai-google-and-anthropic
 
 3) 딥시크, '추론 특화' 자체 AI 칩 개발 착수
-학습이 아니라 추론(AI가 실제 답 뱉는 단계=서버 비용 나오는 곳)에 최적화. 범용 GPU보다 싸고 전력 효율 노림.
+학습이 아니라 추론(AI가 실제 답 뱉는 단계=서버 비용 나오는 곳)에 최적화. 엔비디아·화웨이 탈피 목표, 보도에 엔비디아 주가 2%대 하락.
 👉 추론 비용은 LLM 서비스 원가의 핵심. 칩 경쟁 = 서빙 단가 하락 신호.
-https://www.aitimes.kr/
+https://www.hankyung.com/article/202607071349i
 
 ───── ✂️ 여기서 끊어 보내기 (1/6) ─────
 
 【2/6】📰 뉴스 더보기
 
-🚀 GPT-5.6 Sol/Terra/Luna 확정
-Sol=최고 성능, Terra=이전급 성능인데 값은 절반, Luna=제일 빠르고 쌈.
+🚀 GPT-5.6 Sol/Terra/Luna 공개 — 일반 공개는 7/9(목)
+Sol=최고 성능($5/$30), Terra=이전급 성능인데 값은 절반($2.5/$15), Luna=제일 빠르고 쌈($1/$6).
 👉 "성능 비슷 + 절반 가격" 옵션 등장 → 같은 기능 더 싸게.
-https://www.buildfastwithai.com/blogs/ai-news-today-july-6-2026
+https://openai.com/index/previewing-gpt-5-6-sol/
 
-🚀 Meta 'Muse Spark' 공개
-이미지도 보고, 도구도 스스로 쓰고, 여러 AI를 지휘하듯 조율하는 멀티모달 추론 모델.
-👉 멀티에이전트 앱 만들 때 선택지 하나 추가.
-https://www.buildfastwithai.com/blogs/ai-news-today-july-6-2026
+🚀 Meta, 이미지 생성 모델 'Muse Image' 오늘(7/8) 출시
+Meta AI·인스타그램에 탑재되는 새 비주얼 생성 모델. 4월 나온 추론 모델 Muse Spark에 이어 Muse 패밀리 확장.
+👉 20억 사용자 플랫폼에 이미지 생성 기본 탑재 → 소비자용 생성 AI 배포 규모가 다른 차원.
+https://thetechportal.com/2026/07/08/meta-launches-new-ai-visual-generation-model-muse-image-for-meta-ai-and-instagram/
 
 🔧 캘리포니아, 美 주정부 역대급 AI 도입
-모든 주 기관·시·군이 Claude를 50% 할인가로. 미국 주정부 최대 규모.
+모든 주 기관·시·군이 Claude를 50% 할인가로(6/29 뉴섬 발표). DMV·재난관리청 등 이미 활용 중.
 👉 공공/SI 쪽 AI 개발 수요·채용 증가 신호.
-https://www.crescendo.ai/news/latest-ai-news-and-updates
+https://www.gov.ca.gov/2026/06/29/governor-newsom-announces-a-first-of-its-kind-partnership-providing-anthropic-tools-to-state-agencies-and-improving-services-for-californians/
 
-🌱 KT 에이블스쿨(AIVLE) 10기 모집
-청년 대상 무료 AI 개발자 과정. 입문·전향 준비자에게 좋은 진입 경로.
-https://www.aitimes.kr/
+🌱 KT 에이블스쿨(AIVLE) 10기 모집 (~8/10)
+청년 대상 무료 AI 개발자 과정(6개월, 9월 말 입교). 만 34세 이하 미취업자 대상. 수료생 3,500명이 500여 개 기업 진출.
+https://aivle.kt.co.kr/
 
 ───── ✂️ 여기서 끊어 보내기 (2/6) ─────
 
