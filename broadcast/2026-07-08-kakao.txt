@@ -69,11 +69,11 @@ https://www.youtube.com/watch?v=RzLV8sfFdMM
 - 4.6→5 갈아탈 때 주의점(수동 확장사고·비기본 샘플링=에러)
 https://www.youtube.com/watch?v=iYZTWSFJXTo
 
-🔧 RAG 챗봇 직접 만들어쓰기 (n8n + Supabase) — 한국어
-게시일 미확인(추정 최근) · 노코드 실습
-- 문서 업로드→청크→임베딩→Supabase 저장→검색→AI 응답
-- 코드 없이 사내 문서 챗봇 체험
-https://www.youtube.com/watch?v=Fk5pQ0fQkJ0
+🔧 요즘 판교사투리 1. "하네스 엔지니어링" — 한국어
+추정 ~1개월 전
+- 프롬프트→컨텍스트 다음 화두 '하네스': 에이전트를 감싸는 환경·제약·피드백 루프
+- 에이전트 성능은 모델보다 하네스가 좌우한다는 관점
+https://www.youtube.com/watch?v=q1v1_btl19w
 
 🌱 Claude Sonnet 5 & GPT-5.6 Preview | AI News This Week
 추정 2026-07-03 · 뉴스 요약(큰 그림 1개)
