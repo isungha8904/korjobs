@@ -50,19 +50,23 @@ https://www.aitimes.kr/
 
 【3/6】🎥 볼 만한 영상 (조회수 순)
 
-🚀 Let's build GPT (밑바닥부터) — Andrej Karpathy
+🚀 Let's build GPT: from scratch — Andrej Karpathy
 조회수 500만+ · 약 2시간
 GPT를 코드로 한 줄씩 짜보며 "AI가 어떻게 다음 단어를 맞히나"를 손으로 이해. 에이전트 시대에도 안 바뀌는 기본기.
-https://www.youtube.com/@AndrejKarpathy
+https://www.youtube.com/watch?v=kCc8FmEb1nY
 
-🔧 하루 1억 토큰, 집에 둔 AI 서버 — Mukul Tripathi
+🔧 100M+ Tokens/Day, 집에 둔 AI 서버 — Mukul Tripathi
 조회수 8.5만
 GPU 서버 한 대로 대량 추론 돌리는 셀프호스팅 실전기. "OpenAI 값 부담될 때 직접 서빙하면 얼마?"의 실측.
-https://developereducators.com/best/vllm/
+https://www.youtube.com/watch?v=nMks3l0SFKU
 
-🌱 조코딩 JoCoding (국내 코딩 1위)
-코딩 기초 → AI로 결과물 만들어 수익화까지. 무료 강의, 입문자도 30분이면 돌아가는 걸 만듦.
-https://www.youtube.com/@jocoding
+🔧 Stop Vibe Coding: 컨텍스트 엔지니어링 & RAG — Cole Medin
+데모 말고 "실무에 살아남는 에이전트" 만들기. RAG·벡터DB·프롬프트를 설계 자원으로 다루는 법.
+https://www.youtube.com/watch?v=7zZtxUW6dhc
+
+🔧 RAG 챗봇 직접 만들어쓰기 (n8n + Supabase) — 한국어
+문서만 넣으면 AI가 답하는 RAG 챗봇을 노코드로 뚝딱. 사내 지식 연동 실습에 딱.
+https://www.youtube.com/watch?v=Fk5pQ0fQkJ0
 
 🌱 초고성능 AI '미토스'/앤트로픽 — KBS
 용어 없이 "요즘 AI 무슨 일?"을 뉴스로. 비개발 동료와 대화용/트렌드 감각 잡기 좋음.
