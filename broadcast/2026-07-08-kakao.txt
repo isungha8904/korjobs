@@ -1,0 +1,117 @@
+━━━━━━━━━━━━━━━━━━━━
+🗞️ IT·AI 뉴스 브리핑
+📅 2026-07-08(화) · ⏱ 대략 훑기 5분
+🎯 중급 개발자 + 입문자용 믹스
+🔗 상세 아카이브:
+https://github.com/isungha8904/korjobs/blob/claude/it-ai-news-curation-e99ry4/digests/2026-07-08.md
+━━━━━━━━━━━━━━━━━━━━
+
+【1/6】🔥 오늘의 핵심 3가지
+
+1) 프론티어 모델 대전 재점화
+Claude Sonnet 5가 "에이전트형 코딩"(AI가 알아서 코드 짜고 실행)을 실무로 끌어내렸고, GPT-5.6 Sol은 터미널 작업 벤치마크 1등, Grok 4.5(1.5조 파라미터)는 SpaceX·Tesla 사내 베타 진입.
+👉 지금 쓰는 코딩 툴(코파일럿/커서)의 백엔드 모델 갈아탈 타이밍.
+https://llm-stats.com/llm-updates
+
+2) 백악관, 3사와 '모델 출시 자율표준' 막판 조율
+OpenAI·구글·앤트로픽과 규칙 협의, 다음 주 발표 가능성. 미 수출규제도 6/30 해제.
+👉 모델 배포·리전 제약이 바뀌면 우리가 쓰는 API 가용성에 직접 영향.
+https://www.crescendo.ai/news/latest-ai-news-and-updates
+
+3) 딥시크, '추론 특화' 자체 AI 칩 개발 착수
+학습이 아니라 추론(AI가 실제 답 뱉는 단계=서버 비용 나오는 곳)에 최적화. 범용 GPU보다 싸고 전력 효율 노림.
+👉 추론 비용은 LLM 서비스 원가의 핵심. 칩 경쟁 = 서빙 단가 하락 신호.
+https://www.aitimes.kr/
+
+───── ✂️ 여기서 끊어 보내기 (1/6) ─────
+
+【2/6】📰 뉴스 더보기
+
+🚀 GPT-5.6 Sol/Terra/Luna 확정
+Sol=최고 성능, Terra=이전급 성능인데 값은 절반, Luna=제일 빠르고 쌈.
+👉 "성능 비슷 + 절반 가격" 옵션 등장 → 같은 기능 더 싸게.
+https://www.buildfastwithai.com/blogs/ai-news-today-july-6-2026
+
+🚀 Meta 'Muse Spark' 공개
+이미지도 보고, 도구도 스스로 쓰고, 여러 AI를 지휘하듯 조율하는 멀티모달 추론 모델.
+👉 멀티에이전트 앱 만들 때 선택지 하나 추가.
+https://www.buildfastwithai.com/blogs/ai-news-today-july-6-2026
+
+🔧 캘리포니아, 美 주정부 역대급 AI 도입
+모든 주 기관·시·군이 Claude를 50% 할인가로. 미국 주정부 최대 규모.
+👉 공공/SI 쪽 AI 개발 수요·채용 증가 신호.
+https://www.crescendo.ai/news/latest-ai-news-and-updates
+
+🌱 KT 에이블스쿨(AIVLE) 10기 모집
+청년 대상 무료 AI 개발자 과정. 입문·전향 준비자에게 좋은 진입 경로.
+https://www.aitimes.kr/
+
+───── ✂️ 여기서 끊어 보내기 (2/6) ─────
+
+【3/6】🎥 볼 만한 영상 (조회수 순)
+
+🚀 Let's build GPT (밑바닥부터) — Andrej Karpathy
+조회수 500만+ · 약 2시간
+GPT를 코드로 한 줄씩 짜보며 "AI가 어떻게 다음 단어를 맞히나"를 손으로 이해. 에이전트 시대에도 안 바뀌는 기본기.
+https://www.youtube.com/@AndrejKarpathy
+
+🔧 하루 1억 토큰, 집에 둔 AI 서버 — Mukul Tripathi
+조회수 8.5만
+GPU 서버 한 대로 대량 추론 돌리는 셀프호스팅 실전기. "OpenAI 값 부담될 때 직접 서빙하면 얼마?"의 실측.
+https://developereducators.com/best/vllm/
+
+🌱 조코딩 JoCoding (국내 코딩 1위)
+코딩 기초 → AI로 결과물 만들어 수익화까지. 무료 강의, 입문자도 30분이면 돌아가는 걸 만듦.
+https://www.youtube.com/@jocoding
+
+🌱 초고성능 AI '미토스'/앤트로픽 — KBS
+용어 없이 "요즘 AI 무슨 일?"을 뉴스로. 비개발 동료와 대화용/트렌드 감각 잡기 좋음.
+https://www.youtube.com/watch?v=JXPG5KC01Wg
+
+───── ✂️ 여기서 끊어 보내기 (3/6) ─────
+
+【4/6】🧵 Threads 화제 (MAU 2억 돌파)
+
+🔹 @aiatmeta
+Meta 공식 AI 계정. 최신 모델·연구가 가장 먼저 뜨는 곳.
+https://www.threads.com/@aiatmeta
+
+🔹 #AICoding 태그 (2억 스레드)
+요즘 화두는 "에이전트가 되냐?"가 아니라 "어떻게 매일 쓸 만하게 만드냐" — 릴리스 파이프라인, git에 메모리 묶기 같은 실전 팁이 인기.
+https://www.threads.com/tag/AI-Coding
+
+🔹 Threads에 Meta AI 붙는다
+공개 계정은 글/답글에서 @meta.ai 멘션으로 맥락·뉴스 질의 가능(Grok 유사). 소셜에 LLM 스며드는 흐름.
+https://techcrunch.com/2026/05/12/threads-tests-a-meta-ai-integration-that-works-similarly-to-grok/
+
+───── ✂️ 여기서 끊어 보내기 (4/6) ─────
+
+【5/6】💼 커리어·채용 시그널
+(이 뉴스들이 한국 개발자에게 주는 의미)
+
+📌 코딩 에이전트가 빨라진다 → "에이전트 설계" 수요↑
+단순 API 호출을 넘어 툴 콜링·메모리·멀티에이전트 조율을 설계할 줄 아는 사람이 귀해짐.
+▶ 배워두면 좋은 것: LangChain/에이전트 프레임워크, 툴 콜링 설계
+
+📌 추론칩·셀프호스팅 화제 → "LLMOps" 몸값↑
+추론 비용 최적화(vLLM 서빙, 양자화, GPU 튜닝)가 실무 경쟁력.
+▶ 배워두면 좋은 것: vLLM, 추론 최적화, 모델 서빙
+
+📌 공공·대기업 대규모 도입(캘리포니아·KT·ADD) → 사내 AI 전환(AX) 인력 수요
+보안 지키며 사내 전용 LLM 깔고 운영하는 역할이 늘어남.
+▶ 배워두면 좋은 것: RAG, 사내 데이터 연동, 온프레미스 배포
+
+───── ✂️ 여기서 끊어 보내기 (5/6) ─────
+
+【6/6】📖 용어 한 스푼
+(오늘 나온 말들, 딱 한 줄 정의)
+
+· 추론(inference) = 학습 끝난 AI가 실제로 답을 뱉는 단계. 여기서 서버 비용이 나옴.
+· 에이전트(agent) = 스스로 도구를 쓰고 여러 단계를 밟아 일을 끝내는 AI.
+· 툴 콜링(tool calling) = AI가 검색·코드 실행 같은 외부 기능을 스스로 호출하는 것.
+· vLLM = 오픈소스 LLM 추론 서버. 모델을 빠르고 싸게 서빙해주는 엔진.
+· RAG = 외부 문서를 찾아 참고해서 답하게 하는 기법(사내 지식 연동에 많이 씀).
+· SOTA = State-of-the-Art. 현재까지 나온 것 중 성능 1등.
+
+이번 주도 화이팅! 🚀
+━━━━━━━━━━━━━━━━━━━━

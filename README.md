@@ -2,23 +2,31 @@
 
 중급(intermediate~moderate) 개발자를 위한 IT·AI 뉴스 다이제스트.
 입문용 콘텐츠를 섞어 흥미를 유지하고, **뉴스 + 영상 + Threads**를 조회수/화제성 기준으로 정리합니다.
+결과물은 **카카오톡으로 뿌리기 좋은 플레인 텍스트**와 **GitHub 상세 아카이브** 두 가지로 만듭니다.
 
 ## 구성
 
 | 경로 | 설명 |
 |------|------|
-| `templates/digest-template.md` | 매번 같은 형식으로 받기 위한 재사용 템플릿 |
-| `digests/YYYY-MM-DD.md` | 날짜별 큐레이션 결과물 |
+| `broadcast/YYYY-MM-DD-kakao.txt` | 📱 **카톡 배포용** 플레인 텍스트 (실제 뿌릴 것, 6블록 분할) |
+| `digests/YYYY-MM-DD.md` | GitHub 상세 아카이브 (TL;DR + 접이식 상세) |
+| `digests/README.md` | 📚 회차 아카이브 인덱스 |
+| `glossary.md` | 📖 공용 용어집 (반복 용어 정의) |
+| `templates/digest-template.md` | GitHub 마크다운 템플릿 |
+| `templates/kakao-broadcast-template.txt` | 카톡 플레인 텍스트 템플릿 |
 
 ## 선정 원칙
 - 📈 **조회수/화제성 우선** — 영상은 조회수 순, 뉴스는 화제성 순
 - 🎯 **레벨 믹스** — 🌱 입문 / 🔧 중급 / 🚀 심화를 골고루
 - 🧵 **Threads 항상 포함** — 개발자 커뮤니티 화제 스레드
+- 💼 **커리어·채용 시그널** — 뉴스가 한국 개발자 채용·스킬에 주는 의미
 - 🛠 **실무 적용성** — "그래서 내 코드/커리어에 뭐가 바뀌나"
 
-## 새 다이제스트 만들기
-1. `templates/digest-template.md` 복사 → `digests/<오늘 날짜>.md`
-2. 각 섹션 채우기 (영상은 조회수 순, Threads 섹션 필수)
+## 새 회차 만들기
+1. **GitHub판:** `templates/digest-template.md` 복사 → `digests/<오늘 날짜>.md` 채우기
+2. **카톡판:** `templates/kakao-broadcast-template.txt` 복사 → `broadcast/<오늘 날짜>-kakao.txt`
+   - ⚠️ 카톡은 마크다운 미지원 → 표·`[]()`·`<details>` 금지, **전체 URL** 사용, 6블록 분할
+3. `digests/README.md` 인덱스 맨 위에 한 줄 추가
 
-### 최근 다이제스트
-- [2026-07-08](digests/2026-07-08.md)
+### 최근 회차
+- [2026-07-08](digests/2026-07-08.md) · [카톡판](broadcast/2026-07-08-kakao.txt)
