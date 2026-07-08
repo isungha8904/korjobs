@@ -1,0 +1,130 @@
+━━━━━━━━━━━━━━━━━━━━
+🗞️ IT·AI 뉴스 브리핑
+📅 2026-07-08(화) · ⏱ 대략 훑기 5분
+🎯 중급 개발자 + 입문자용 믹스
+🔗 상세 아카이브:
+https://github.com/isungha8904/korjobs/blob/claude/it-ai-news-curation-e99ry4/digests/2026-07-08.md
+━━━━━━━━━━━━━━━━━━━━
+
+【1/6】🔥 오늘의 핵심 3가지
+
+1) 프론티어 모델 대전 재점화
+Claude Sonnet 5가 "에이전트형 코딩"(AI가 알아서 코드 짜고 실행)을 실무로 끌어내렸고, GPT-5.6 Sol은 터미널 작업 벤치마크 1등, Grok 4.5(1.5조 파라미터)는 SpaceX·Tesla 사내 베타 진입.
+👉 지금 쓰는 코딩 툴(코파일럿/커서)의 백엔드 모델 갈아탈 타이밍.
+https://www.anthropic.com/news/claude-sonnet-5
+
+2) 백악관, 3사와 '모델 출시 자율표준' 막판 조율
+OpenAI·구글·앤트로픽과 규칙 협의, 이번 주 발표 가능성. 새 모델 출시 전 정부가 최대 30일 안보 검토하는 구조. 미 수출규제도 6/30 해제.
+👉 모델 배포·리전 제약이 바뀌면 우리가 쓰는 API 가용성에 직접 영향.
+https://www.tipranks.com/news/white-house-races-to-finalize-ai-model-rules-with-openai-google-and-anthropic
+
+3) 딥시크, '추론 특화' 자체 AI 칩 개발 착수
+학습이 아니라 추론(AI가 실제 답 뱉는 단계=서버 비용 나오는 곳)에 최적화. 엔비디아·화웨이 탈피 목표, 보도에 엔비디아 주가 2%대 하락.
+👉 추론 비용은 LLM 서비스 원가의 핵심. 칩 경쟁 = 서빙 단가 하락 신호.
+https://www.hankyung.com/article/202607071349i
+
+───── ✂️ 여기서 끊어 보내기 (1/6) ─────
+
+【2/6】📰 뉴스 더보기
+
+🚀 GPT-5.6 Sol/Terra/Luna 공개 — 일반 공개는 7/9(목)
+Sol=최고 성능($5/$30), Terra=이전급 성능인데 값은 절반($2.5/$15), Luna=제일 빠르고 쌈($1/$6).
+👉 "성능 비슷 + 절반 가격" 옵션 등장 → 같은 기능 더 싸게.
+https://openai.com/index/previewing-gpt-5-6-sol/
+
+🚀 Meta, 이미지 생성 모델 'Muse Image' 오늘(7/8) 출시
+Meta AI·인스타그램에 탑재되는 새 비주얼 생성 모델. 4월 나온 추론 모델 Muse Spark에 이어 Muse 패밀리 확장.
+👉 20억 사용자 플랫폼에 이미지 생성 기본 탑재 → 소비자용 생성 AI 배포 규모가 다른 차원.
+https://thetechportal.com/2026/07/08/meta-launches-new-ai-visual-generation-model-muse-image-for-meta-ai-and-instagram/
+
+🔧 캘리포니아, 美 주정부 역대급 AI 도입
+모든 주 기관·시·군이 Claude를 50% 할인가로(6/29 뉴섬 발표). DMV·재난관리청 등 이미 활용 중.
+👉 공공/SI 쪽 AI 개발 수요·채용 증가 신호.
+https://www.gov.ca.gov/2026/06/29/governor-newsom-announces-a-first-of-its-kind-partnership-providing-anthropic-tools-to-state-agencies-and-improving-services-for-californians/
+
+🌱 KT 에이블스쿨(AIVLE) 10기 모집 (~8/10)
+청년 대상 무료 AI 개발자 과정(6개월, 9월 말 입교). 만 34세 이하 미취업자 대상. 수료생 3,500명이 500여 개 기업 진출.
+https://aivle.kt.co.kr/
+
+───── ✂️ 여기서 끊어 보내기 (2/6) ─────
+
+【3/6】🎥 볼 만한 영상 (실습·튜토리얼 위주 · 최근 2주)
+※ 게시일은 추정이에요. 유튜브 접근이 막혀 정확한 날짜·조회수는 미확인이니 한 번씩 눌러 확인!
+
+🌱 How to Build AI Agents in 14 minutes Using Claude (초보용)
+추정 ~3주 전 · 약 14분
+- 14분 만에 Claude로 첫 에이전트 뚝딱
+- "에이전트가 뭔지"를 만들면서 체감
+https://www.youtube.com/watch?v=3MX7rVeVIYw
+
+🔧 How to Build Effective Claude Code Agents in 2026
+추정 ~3주 전
+- 서브에이전트로 역할 분담, 도구·권한 설정
+- 데모 말고 실무에 쓸 에이전트 패턴
+https://www.youtube.com/watch?v=RzLV8sfFdMM
+
+🔧 Claude 새 업그레이드 (Sonnet 5 & 새 플러그인)
+추정 6/30 이후 · 기능 리뷰
+- 적응형 thinking 기본, 1M 컨텍스트·128k 출력
+- 4.6→5 갈아탈 때 주의점(수동 확장사고·비기본 샘플링=에러)
+https://www.youtube.com/watch?v=iYZTWSFJXTo
+
+🔧 요즘 판교사투리 1. "하네스 엔지니어링" — 한국어
+추정 ~1개월 전
+- 프롬프트→컨텍스트 다음 화두 '하네스': 에이전트를 감싸는 환경·제약·피드백 루프
+- 에이전트 성능은 모델보다 하네스가 좌우한다는 관점
+https://www.youtube.com/watch?v=q1v1_btl19w
+
+🌱 Claude Sonnet 5 & GPT-5.6 Preview | AI News This Week
+추정 2026-07-03 · 뉴스 요약(큰 그림 1개)
+- Sonnet 5 정식, GPT-5.6 게이티드 프리뷰
+- 실습 전에 이번 주 판도 5분 정리
+https://www.youtube.com/watch?v=lkmDHAxpNG4
+
+───── ✂️ 여기서 끊어 보내기 (3/6) ─────
+
+【4/6】🧵 Threads 화제 (MAU 2억 돌파)
+
+🔹 @aiatmeta
+Meta 공식 AI 계정. 최신 모델·연구가 가장 먼저 뜨는 곳.
+https://www.threads.com/@aiatmeta
+
+🔹 #AICoding 태그 (2억 스레드)
+요즘 화두는 "에이전트가 되냐?"가 아니라 "어떻게 매일 쓸 만하게 만드냐" — 릴리스 파이프라인, git에 메모리 묶기 같은 실전 팁이 인기.
+https://www.threads.com/tag/AI-Coding
+
+🔹 Threads에 Meta AI 붙는다
+공개 계정은 글/답글에서 @meta.ai 멘션으로 맥락·뉴스 질의 가능(Grok 유사). 소셜에 LLM 스며드는 흐름.
+https://techcrunch.com/2026/05/12/threads-tests-a-meta-ai-integration-that-works-similarly-to-grok/
+
+───── ✂️ 여기서 끊어 보내기 (4/6) ─────
+
+【5/6】💼 커리어·채용 시그널
+(이 뉴스들이 한국 개발자에게 주는 의미)
+
+📌 코딩 에이전트가 빨라진다 → "에이전트 설계" 수요↑
+단순 API 호출을 넘어 툴 콜링·메모리·멀티에이전트 조율을 설계할 줄 아는 사람이 귀해짐.
+▶ 배워두면 좋은 것: LangChain/에이전트 프레임워크, 툴 콜링 설계
+
+📌 추론칩·셀프호스팅 화제 → "LLMOps" 몸값↑
+추론 비용 최적화(vLLM 서빙, 양자화, GPU 튜닝)가 실무 경쟁력.
+▶ 배워두면 좋은 것: vLLM, 추론 최적화, 모델 서빙
+
+📌 공공·대기업 대규모 도입(캘리포니아·KT·ADD) → 사내 AI 전환(AX) 인력 수요
+보안 지키며 사내 전용 LLM 깔고 운영하는 역할이 늘어남.
+▶ 배워두면 좋은 것: RAG, 사내 데이터 연동, 온프레미스 배포
+
+───── ✂️ 여기서 끊어 보내기 (5/6) ─────
+
+【6/6】📖 용어 한 스푼
+(오늘 나온 말들, 딱 한 줄 정의)
+
+· 추론(inference) = 학습 끝난 AI가 실제로 답을 뱉는 단계. 여기서 서버 비용이 나옴.
+· 에이전트(agent) = 스스로 도구를 쓰고 여러 단계를 밟아 일을 끝내는 AI.
+· 툴 콜링(tool calling) = AI가 검색·코드 실행 같은 외부 기능을 스스로 호출하는 것.
+· vLLM = 오픈소스 LLM 추론 서버. 모델을 빠르고 싸게 서빙해주는 엔진.
+· RAG = 외부 문서를 찾아 참고해서 답하게 하는 기법(사내 지식 연동에 많이 씀).
+· SOTA = State-of-the-Art. 현재까지 나온 것 중 성능 1등.
+
+이번 주도 화이팅! 🚀
+━━━━━━━━━━━━━━━━━━━━
