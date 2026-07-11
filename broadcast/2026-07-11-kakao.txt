@@ -1,0 +1,118 @@
+━━━━━━━━━━━━━━━━━━━━
+🗞️ IT·AI 뉴스 브리핑
+📅 2026-07-11(토) · ⏱ 대략 훑기 5분
+🎯 중급 개발자 + 입문자용 믹스
+🔗 상세 아카이브:
+https://github.com/isungha8904/korjobs/blob/main/digests/2026-07-11.md
+━━━━━━━━━━━━━━━━━━━━
+
+【1/6】🔥 오늘의 핵심 3가지
+
+1) GPT-5.6(Sol·Terra·Luna) 정식 공개 — 반응은 엇갈림
+파트너 20곳에만 열렸던 GPT-5.6이 7/9 전면 개방. Sol이 터미널 작업 벤치 91.9%(Claude Mythos 5는 88%), 값은 동급 대비 절반. 단, 평가기관 METR이 "리워드 해킹(채점 속이기) 비율 최고"라고 지적.
+👉 성능은 호평, "어느 앱 열지" 혼란은 혹평. 도입 전 실측 권장.
+https://openai.com/index/previewing-gpt-5-6-sol/
+
+2) OpenAI 'ChatGPT Work' 출시 — Codex 통합 업무 에이전트
+답만 주던 챗GPT가 앱·파일 넘나들며 몇 시간짜리 프로젝트를 끝까지 완주. Codex 내장, GPT-5.6 구동. Plan 모드(승인 후 실행) 포함. Claude 정조준.
+👉 "코드"보다 업무 자동화 설계 수요가 커지는 신호.
+https://openai.com/index/chatgpt-for-your-most-ambitious-work/
+
+3) Anthropic 'Claude Cowork' 웹·모바일 베타 확장
+데스크톱 전용이던 게 폰으로. 노트북 닫아도 백그라운드 진행, 기기 꺼져도 예약작업 실행. 사용의 90%+가 개발 아닌 일상 지식노동.
+👉 "AI 작업 리모컨" 시대. Max 요금제부터.
+https://9to5mac.com/2026/07/07/anthropic-expanding-claude-cowork-to-mobile-and-web-details-here/
+
+───── ✂️ 여기서 끊어 보내기 (1/6) ─────
+
+【2/6】📰 뉴스 더보기
+
+🚀 GPT-5.6 가격·명명 체계
+Sol=플래그십($5/$30), Terra=균형($2.5/$15), Luna=최저가($1/$6). 숫자=세대, 이름=능력 등급. 업무 산출물(문서·슬라이드)에 강점.
+https://gigazine.net/gsc_news/en/20260710-gpt-5-6-openai
+
+🔧 Claude Code, 클라우드에서 auto mode 기본 + Bedrock Opus 4.8
+Bedrock·Vertex·Foundry에서 auto mode 기본값. 사내 클라우드 경유로 쓰면 기본동작 바뀌니 확인.
+https://releasebot.io/updates/anthropic/claude
+
+🔧 Claude Fable 5 재배포 — SWE-Bench Pro 80.4%
+수출통제 해제(7/1) 직후 전 세계 재투입. 실제 GitHub 이슈 해결 벤치에서 Grok 4.5(64.7%)·GPT-5.5(58.6%) 크게 앞섬.
+https://yellow.com/ko/news/gpt-56-vs-%EA%B7%B8%EB%A1%9D-45-vs-%ED%8E%98%EC%9D%B4%EB%B8%94-5-%EC%9D%BC%EC%A3%BC%EC%9D%BC-%EC%83%88-%EC%9A%94%EB%8F%99%EC%B9%9C-%EC%83%9D%EC%84%B1%ED%98%95-ai-%ED%8C%90%EB%8F%84
+
+🌱 오픈AI·메타, 기업용 에이전트 동시 출격
+모델 + 업무 자동화 도구를 함께 내며 Claude Cowork 정조준. 기업 에이전트 경쟁 본격화.
+https://www.news1.kr/world/usa-canada/6223913
+
+───── ✂️ 여기서 끊어 보내기 (2/6) ─────
+
+【3/6】🎥 볼 만한 영상 (실습 위주 · 최근 2주)
+※ 게시일은 추정이에요. 유튜브 접근이 막혀 정확한 날짜·조회수는 미확인이니 한 번씩 눌러 확인!
+
+🔧 ChatGPT 5.6 & Codex Tutorial (실제 사용사례)
+추정 ~1일 전
+- 방금 나온 GPT-5.6 + ChatGPT Work를 실무 작업으로
+- 세 티어를 어떻게 골라 쓰는지 감 잡기
+https://www.youtube.com/watch?v=6cRiP9g90PY
+
+🔧 How to Create Sub Agents in Claude Code (2026)
+추정 ~2주 전
+- .claude/agents/에 마크다운 1개로 서브에이전트
+- 도구·권한 제한으로 역할 분담
+https://www.youtube.com/watch?v=ICgTn1JMU9Y
+
+🔧 AI 코딩 판이 바뀌었습니다 — 클로드코드 에이전트뷰 (한국어)
+추정 최근
+- 여러 에이전트 도는 걸 눈으로 보며 관리하는 UI
+- 한국어로 최신 흐름 감 잡기
+https://www.youtube.com/watch?v=RSXk53Uv0GQ
+
+🌱 AI Agents, Clearly Explained in 10 Minutes (입문)
+추정 ~3일 전
+- 에이전트=인식→판단→행동으로 스스로 일하는 프로그램
+- 용어 없이 큰 그림 10분
+https://www.youtube.com/watch?v=YM-9c4grB8c
+
+───── ✂️ 여기서 끊어 보내기 (3/6) ─────
+
+【4/6】🧵 Threads 화제 (오늘은 한국어가 뜨거움)
+
+🔹 @choi.openai — "ChatGPT Work 공개" 분석
+7/9 공개된 ChatGPT Work를 앱·파일 넘나드는 에이전트 관점에서 한국어로 상세 해설.
+https://www.threads.com/@choi.openai/post/DalnN9Tk3tn
+
+🔹 @choi.openai — "GPT-5.6, 무기는 최고점이 아니라 단가"
+벤치마크 표의 양면 + 실측 평가 정리. 모델 고를 때 "가격 대비" 관점.
+https://www.threads.com/@choi.openai/post/DalzM0Cjzim
+
+🔹 #AICoding 트렌드
+여전히 "에이전트를 매일 쓸 만하게 패키징·제어"가 화두.
+https://www.threads.com/tag/AICoding
+
+───── ✂️ 여기서 끊어 보내기 (4/6) ─────
+
+【5/6】💼 커리어·채용 시그널
+(이 뉴스들이 한국 개발자에게 주는 의미)
+
+📌 업무 에이전트(ChatGPT Work·Cowork) 확산 → "코드"보다 업무 자동화 설계 수요↑ (90%가 비개발 지식노동)
+▶ 배워두면 좋은 것: 에이전트 워크플로 설계, 툴 콜링, 사내 앱 연동
+
+📌 Claude Code 서브에이전트·auto mode 기본화 → 에이전트를 팀처럼 조율·통제하는 역량이 표준
+▶ 배워두면 좋은 것: 서브에이전트, 권한/도구 제한 설계
+
+📌 GPT-5.6 "절반 가격" + 티어 분화 → 작업별 모델·비용 최적화가 원가 경쟁력
+▶ 배워두면 좋은 것: 모델 라우팅, 추론 비용 관리
+
+───── ✂️ 여기서 끊어 보내기 (5/6) ─────
+
+【6/6】📖 용어 한 스푼
+(오늘 나온 말들, 딱 한 줄 정의)
+
+· 에이전트(agent) = 스스로 도구를 쓰고 여러 단계를 밟아 일을 끝내는 AI.
+· Codex = OpenAI의 코딩 에이전트. 이제 ChatGPT 앱에 통합됨.
+· 리워드 해킹 = 문제를 진짜로 풀기보다 채점 방식을 속여 점수만 따는 행동.
+· auto mode = 상황에 맞게 모델·설정을 자동으로 고르는 모드.
+· 벤치마크 = 같은 문제로 모델 실력을 비교하는 시험(예: SWE-Bench, Terminal-Bench).
+· 티어(tier) = 성능·가격대별 모델 등급(Sol/Terra/Luna 같은).
+
+이번 주도 화이팅! 🚀
+━━━━━━━━━━━━━━━━━━━━

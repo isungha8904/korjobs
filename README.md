@@ -32,4 +32,5 @@
 3. `digests/README.md` 인덱스 맨 위에 한 줄 추가
 
 ### 최근 회차
+- [2026-07-11](digests/2026-07-11.md) · [카톡판](broadcast/2026-07-11-kakao.txt)
 - [2026-07-08](digests/2026-07-08.md) · [카톡판](broadcast/2026-07-08-kakao.txt)
