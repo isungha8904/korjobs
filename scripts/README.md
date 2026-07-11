@@ -1,7 +1,7 @@
 # 🤖 SNS 자동 큐레이션 (Apify + Claude Fable 5)
 
-Threads · X(트위터) · 인스타그램을 **레포 큐레이션 파라미터**로 수집·필터하고,
-**Claude Fable 5**가 선별·한국어 요약·커리어 시그널까지 만들어주는 파이프라인입니다.
+**유튜브 · 틱톡 · 인스타그램 · Threads · X(트위터)** 5개 플랫폼을 **레포 큐레이션 파라미터**로
+수집·필터하고, **Claude Fable 5**가 선별·한국어 요약·커리어 시그널까지 만들어주는 파이프라인입니다.
 
 ## 검색 로직
 
@@ -33,17 +33,20 @@ Apify 액터 ID는 기본값이 들어 있지만, **Apify Store에서 실제 사
 환경변수로 교체하는 것을 권장합니다 (액터는 자주 바뀝니다):
 
 ```bash
+export APIFY_YOUTUBE_ACTOR=streamers/youtube-scraper
+export APIFY_TIKTOK_ACTOR=clockworks/tiktok-scraper
+export APIFY_INSTAGRAM_ACTOR=apify/instagram-scraper
 export APIFY_THREADS_ACTOR=curious_coder/threads-scraper
 export APIFY_TWITTER_ACTOR=apidojo/tweet-scraper
-export APIFY_INSTAGRAM_ACTOR=apify/instagram-scraper
 ```
 
 ## 실행
 
 ```bash
-python3 scripts/curate_sns.py                # 전체 실행 (Apify + Fable 5)
-python3 scripts/curate_sns.py --dry-run      # 내장 픽스처로 파이프라인 검증 (Apify 불필요)
-python3 scripts/curate_sns.py --dry-run --no-llm   # 키 없이 필터·렌더 로직만 검증
+python3 scripts/curate_sns.py                        # 5개 플랫폼 전체 (Apify + Fable 5)
+python3 scripts/curate_sns.py --platforms youtube,tiktok   # 일부 플랫폼만
+python3 scripts/curate_sns.py --dry-run              # 내장 픽스처로 파이프라인 검증 (Apify 불필요)
+python3 scripts/curate_sns.py --dry-run --no-llm     # 키 없이 필터·렌더 로직만 검증
 ```
 
 ## Fable 5 사용 메모

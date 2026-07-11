@@ -2,7 +2,7 @@
 """korjobs SNS 큐레이션 파이프라인 — Apify(수집) + Claude Fable 5(선별·요약).
 
 흐름:
-  1. Apify 액터로 Threads / Twitter(X) / Instagram 게시물 수집
+  1. Apify 액터로 YouTube / TikTok / Instagram / Threads / Twitter(X) 게시물 수집
   2. 레포 원칙 파라미터로 필터 (최근 2주 · 조회수/반응 최소치 · 직접 URL · 키워드)
   3. Claude Fable 5가 후보를 선별·레벨 분류(🌱/🔧/🚀)·한국어 요약·커리어 시그널 작성
   4. GitHub 다이제스트용 마크다운 + 카톡 배포용 플레인텍스트 블록 생성
@@ -44,6 +44,31 @@ PARAMS = {
 # (액터마다 input/출력 필드가 달라서 normalize()가 여러 필드명을 흡수함)
 # ---------------------------------------------------------------------------
 ACTORS = {
+    "youtube": {
+        "actor_id": os.environ.get("APIFY_YOUTUBE_ACTOR", "streamers/youtube-scraper"),
+        "run_input": lambda kw: {
+            "searchKeywords": kw,
+            "maxResults": 60,
+            "sortingOrder": "views",
+            "dateFilter": "month",   # 최근 한 달로 1차 컷 (2주 필터는 코드에서)
+        },
+    },
+    "tiktok": {
+        "actor_id": os.environ.get("APIFY_TIKTOK_ACTOR", "clockworks/tiktok-scraper"),
+        "run_input": lambda kw: {
+            "searchQueries": kw,
+            "resultsPerPage": 60,
+        },
+    },
+    "instagram": {
+        "actor_id": os.environ.get("APIFY_INSTAGRAM_ACTOR", "apify/instagram-scraper"),
+        "run_input": lambda kw: {
+            "search": " OR ".join(kw[:3]),
+            "searchType": "hashtag",
+            "resultsType": "posts",
+            "resultsLimit": 100,
+        },
+    },
     "threads": {
         "actor_id": os.environ.get("APIFY_THREADS_ACTOR", "curious_coder/threads-scraper"),
         "run_input": lambda kw: {"searchQueries": kw, "maxItems": 100},
@@ -56,15 +81,6 @@ ACTORS = {
             "sort": "Top",
         },
     },
-    "instagram": {
-        "actor_id": os.environ.get("APIFY_INSTAGRAM_ACTOR", "apify/instagram-scraper"),
-        "run_input": lambda kw: {
-            "search": " OR ".join(kw[:3]),
-            "searchType": "hashtag",
-            "resultsType": "posts",
-            "resultsLimit": 100,
-        },
-    },
 }
 
 SEARCH_TERMS = ["AI coding", "Claude agent", "GPT-5.6", "AI 에이전트", "개발자 AI"]
@@ -73,7 +89,7 @@ SEARCH_TERMS = ["AI coding", "Claude agent", "GPT-5.6", "AI 에이전트", "개�
 # ---------------------------------------------------------------------------
 # 1) 수집
 # ---------------------------------------------------------------------------
-def collect_from_apify() -> list[dict]:
+def collect_from_apify(platforms: list[str]) -> list[dict]:
     from apify_client import ApifyClient  # 지연 임포트 (--dry-run이면 불필요)
 
     token = os.environ.get("APIFY_TOKEN")
@@ -82,7 +98,7 @@ def collect_from_apify() -> list[dict]:
     client = ApifyClient(token)
 
     items: list[dict] = []
-    for platform, cfg in ACTORS.items():
+    for platform, cfg in ((p, ACTORS[p]) for p in platforms):
         try:
             run = client.actor(cfg["actor_id"]).call(run_input=cfg["run_input"](SEARCH_TERMS))
             dataset = client.dataset(run["defaultDatasetId"]).list_items().items
@@ -106,16 +122,24 @@ def _first(raw: dict, *keys):
 
 
 def normalize(platform: str, raw: dict) -> dict | None:
-    """액터별 상이한 출력 스키마 → 공통 스키마."""
-    url = _first(raw, "url", "postUrl", "twitterUrl", "link", "shortUrl")
-    text = _first(raw, "text", "caption", "fullText", "content", "title") or ""
-    published = _first(raw, "createdAt", "created_at", "timestamp", "publishedAt", "date")
+    """액터별 상이한 출력 스키마 → 공통 스키마.
+
+    흡수하는 필드명 예시 — YouTube(streamers): url/title/viewCount/date,
+    TikTok(clockworks): webVideoUrl/text/playCount/diggCount/createTimeISO,
+    Instagram: url/caption/videoViewCount/likesCount/timestamp,
+    Threads: url/text/likeCount, X(apidojo): twitterUrl/fullText/viewCount/retweetCount.
+    """
+    url = _first(raw, "url", "postUrl", "twitterUrl", "webVideoUrl", "videoUrl", "link", "shortUrl")
+    text = _first(raw, "text", "caption", "fullText", "content", "title", "desc") or ""
+    published = _first(raw, "createdAt", "created_at", "timestamp", "publishedAt",
+                       "date", "createTimeISO", "createTime", "uploadedAt", "uploadDate")
     views = _first(raw, "viewCount", "views", "playCount", "videoViewCount", "impressions")
     likes = _first(raw, "likeCount", "likes", "likesCount", "favouriteCount", "diggCount") or 0
-    reposts = _first(raw, "repostCount", "retweetCount", "reposts", "sharesCount") or 0
-    author = _first(raw, "username", "author", "ownerUsername", "userName", "handle")
+    reposts = _first(raw, "repostCount", "retweetCount", "reposts", "sharesCount", "shareCount") or 0
+    author = _first(raw, "username", "author", "ownerUsername", "userName", "handle",
+                    "channelName", "channelUsername", "authorMeta")
     if isinstance(author, dict):
-        author = _first(author, "username", "userName", "name", "screen_name")
+        author = _first(author, "username", "userName", "name", "screen_name", "nickName")
     if not url or not text:
         return None
     return {
@@ -202,7 +226,8 @@ OUTPUT_SCHEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "platform": {"type": "string", "enum": ["threads", "twitter", "instagram"]},
+                    "platform": {"type": "string",
+                                 "enum": ["youtube", "tiktok", "instagram", "threads", "twitter"]},
                     "url": {"type": "string"},
                     "level": {"type": "string", "enum": ["🌱", "🔧", "🚀"]},
                     "title_ko": {"type": "string"},
@@ -295,11 +320,17 @@ def rank_only(candidates: list[dict]) -> dict:
 # ---------------------------------------------------------------------------
 # 4) 렌더링
 # ---------------------------------------------------------------------------
-PLATFORM_LABEL = {"threads": "🧵 Threads", "twitter": "🐦 X(트위터)", "instagram": "📸 인스타그램"}
+PLATFORM_LABEL = {
+    "youtube": "📺 유튜브",
+    "tiktok": "🎵 틱톡",
+    "instagram": "📸 인스타그램",
+    "threads": "🧵 Threads",
+    "twitter": "🐦 X(트위터)",
+}
 
 
 def render_markdown(result: dict) -> str:
-    lines = ["## 🧵 SNS 화제 (Threads · X · 인스타그램)", "",
+    lines = ["## 📡 SNS 화제 (유튜브 · 틱톡 · 인스타 · Threads · X)", "",
              "> Apify 수집 + Fable 5 선별 (최근 2주 · 반응 상위 · 직접 링크만)", ""]
     for p in result["picks"]:
         lines += [
@@ -315,7 +346,7 @@ def render_markdown(result: dict) -> str:
 
 
 def render_kakao(result: dict) -> str:
-    lines = ["【SNS】🧵 Threads·X·인스타 화제", ""]
+    lines = ["【SNS】📡 유튜브·틱톡·인스타·Threads·X 화제", ""]
     for p in result["picks"]:
         lines += [
             f"{p['level']} {PLATFORM_LABEL[p['platform']]} — {p['title_ko']}",
@@ -334,6 +365,12 @@ def render_kakao(result: dict) -> str:
 def fixtures() -> list[dict]:
     now = datetime.now(timezone.utc)
     return [
+        {"platform": "youtube", "url": "https://www.youtube.com/watch?v=FIXTURE01",
+         "author": "devtuber", "text": "Claude Code 서브에이전트 실전 튜토리얼",
+         "published_at": (now - timedelta(days=4)).isoformat(), "views": 220000, "likes": 8000, "reposts": 0},
+        {"platform": "tiktok", "url": "https://www.tiktok.com/@dev/video/7000000001",
+         "author": "airecap", "text": "GPT-5.6 나온 거 30초 정리 #ai",
+         "published_at": (now - timedelta(days=1)).isoformat(), "views": 480000, "likes": 30000, "reposts": 900},
         {"platform": "threads", "url": "https://www.threads.com/@dev/post/AAA",
          "author": "dev", "text": "GPT-5.6 Sol로 agent 파이프라인 재구축한 후기",
          "published_at": (now - timedelta(days=2)).isoformat(), "views": 52000, "likes": 900, "reposts": 120},
@@ -358,9 +395,18 @@ def main() -> None:
     ap.add_argument("--dry-run", action="store_true", help="Apify 대신 픽스처 사용")
     ap.add_argument("--no-llm", action="store_true", help="Fable 5 생략(필터·렌더만 테스트)")
     ap.add_argument("--out-dir", default="out", help="결과 저장 디렉토리")
+    ap.add_argument("--platforms", default=",".join(ACTORS),
+                    help=f"수집할 플랫폼 (콤마 구분, 기본: 전체 = {','.join(ACTORS)})")
     args = ap.parse_args()
 
-    items = fixtures() if args.dry_run else collect_from_apify()
+    platforms = [p.strip() for p in args.platforms.split(",") if p.strip()]
+    unknown = [p for p in platforms if p not in ACTORS]
+    if unknown:
+        sys.exit(f"알 수 없는 플랫폼: {unknown} (지원: {list(ACTORS)})")
+
+    items = fixtures() if args.dry_run else collect_from_apify(platforms)
+    if args.dry_run:
+        items = [i for i in items if i["platform"] in platforms]
     print(f"[filter] 수집 {len(items)}건", file=sys.stderr)
     candidates = apply_filters(items)
     print(f"[filter] 파라미터 통과 {len(candidates)}건 "
