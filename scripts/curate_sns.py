@@ -288,6 +288,15 @@ def curate_with_fable(candidates: list[dict]) -> dict:
         detail = getattr(msg, "stop_details", None)
         sys.exit(f"모델이 요청을 거절했습니다 (fallback 포함 전체 거절): {detail}")
 
+    # 실측용 usage 로그 — 1일 비용 추정 근거 ($/1M tokens 기준)
+    PRICE = {"claude-fable-5": (10, 50), "claude-opus-4-8": (5, 25), "claude-sonnet-5": (3, 15)}
+    u = msg.usage
+    in_tok = u.input_tokens + (u.cache_read_input_tokens or 0) + (u.cache_creation_input_tokens or 0)
+    p_in, p_out = next((v for k, v in PRICE.items() if msg.model.startswith(k)), (10, 50))
+    cost = in_tok / 1e6 * p_in + u.output_tokens / 1e6 * p_out
+    print(f"[usage] model={msg.model} input={in_tok:,} output={u.output_tokens:,} "
+          f"≈ ${cost:.3f}/run", file=sys.stderr)
+
     text = next(b.text for b in msg.content if b.type == "text")
     result = json.loads(text)
 
