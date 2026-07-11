@@ -14,6 +14,7 @@
 | `glossary.md` | 📖 공용 용어집 (반복 용어 정의) |
 | `templates/digest-template.md` | GitHub 마크다운 템플릿 |
 | `templates/kakao-broadcast-template.txt` | 카톡 플레인 텍스트 템플릿 |
+| `scripts/curate_sns.py` | 🤖 **SNS 자동 큐레이션** — Apify(Threads·X·인스타 수집) + Claude Fable 5(선별·요약). [사용법](scripts/README.md) |
 
 ## 선정 원칙
 - 📈 **화제성/실용성 우선** — 영상은 실습·튜토리얼 위주(뉴스요약은 최소), 뉴스는 화제성 순
