@@ -116,3 +116,20 @@ https://www.threads.com/tag/AICoding
 
 이번 주도 화이팅! 🚀
 ━━━━━━━━━━━━━━━━━━━━
+
+───── ✂️ 추가로 보내기 (보너스) ─────
+
+【+】🔄 오후 업데이트
+
+🚀 중국 AI 모델, 미국 기업 API 토큰의 30~46% 차지 (CNBC 조사)
+가격이 60~90% 싸서(DeepSeek $0.14 vs GPT-5.5 $5.0 per 1M) 기업들이 갈아탐. 1년 전 11%→최고 46%. 미 의회는 안보 조사 착수.
+👉 모델 골라 쓰는 비용 최적화가 진짜 경쟁력이라는 데이터. 단 규제 리스크도 고려.
+https://www.cnbc.com/2026/07/07/chinese-ai-models-costs-us-openai-anthropic.html
+
+🔧 美 연준, a16z 앤드리슨을 AI·일자리 태스크포스 공동의장에 (7/9)
+"AI가 고용·생산성을 어떻게 바꾸나"가 중앙은행 공식 의제로. 연말까지 권고안.
+https://www.washingtonpost.com/business/2026/07/09/federal-reserve-enlists-marc-andreessen-advise-ai-under-warsh/
+
+🌱 휴머노이드 상장 러시 — Agility $2.5B SPAC·Unitree 상하이 IPO
+로봇이 증시로 = 로봇 제어·시뮬레이션·에이전트 SW 채용 늘어나는 신호.
+https://techcrunch.com/2026/06/24/agility-robotics-plans-to-go-public-via-spac-in-a-2-5b-deal/
