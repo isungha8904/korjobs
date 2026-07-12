@@ -29,6 +29,7 @@
 | `/career-signal` | `.claude/commands/career-signal.md` | `news.json` (읽기) | `data/<날짜>/career.json` |
 | `/assemble-digest` | `.claude/commands/assemble-digest.md` | 위 4개 JSON (읽기) | `digests/<날짜>.md`, `digests/README.md` |
 | `/format-kakao` | `.claude/commands/format-kakao.md` | 위 4개 JSON (읽기) | `broadcast/<날짜>-kakao.txt` |
+| `/format-discord` | `.claude/commands/format-discord.md` | 위 4개 JSON (읽기) | `broadcast/<날짜>-discord.json` |
 
 **규칙**
 - 각 컴포넌트는 **자기 출력 파일만** 쓰고, 다른 컴포넌트의 산출물은 읽기만 합니다.
