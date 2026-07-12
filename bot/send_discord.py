@@ -24,6 +24,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
+# ══════════════════════ 상수 · 한도 ══════════════════════
+# 섹션 순서와 각 필드의 글자 수 한도(디스코드/편집 모달 제약)
+
 SECTION_ORDER = ["top3", "news", "videos", "threads", "career", "glossary"]
 TITLE_LIMIT = 256
 DESC_HARD_LIMIT = 4000   # 편집 모달 TextInput 최대치 — 이 이상이면 모달 프리필이 깨진다
@@ -32,6 +35,9 @@ CONTENT_LIMIT = 2000
 FOOTER_LIMIT = 2048
 EMBED_TOTAL_LIMIT = 6000  # 디스코드 임베드 합산(제목+본문+footer 등) 한도
 
+
+# ══════════════════════ 유틸 함수 ══════════════════════
+# 시각 포맷·에러 종료·페이로드 파일 읽기/쓰기 등 작은 도우미들
 
 def now_iso() -> str:
     return datetime.now().astimezone().isoformat(timespec="seconds")
@@ -69,6 +75,9 @@ def load_payload(date: str):
 def save_payload(path: Path, payload: dict):
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+
+# ══════════════════════ routes.json 로딩 ══════════════════════
+# 섹션 → 발송 채널 매핑(영구 규칙)을 읽고 검증
 
 ROUTES_PATH = REPO_ROOT / "bot" / "routes.json"
 
@@ -108,6 +117,9 @@ def load_routes():
             routes[key] = ids
     return routes, errors, warnings
 
+
+# ══════════════════════ 배포판 검증 ══════════════════════
+# 발송 전 페이로드가 계약(키·순서·글자 수 한도)을 지키는지 확인
 
 def validate(payload: dict):
     """(errors, warnings, report_lines) 반환. errors 가 있으면 발송 불가."""
@@ -152,6 +164,8 @@ def validate(payload: dict):
         errors.append("모든 섹션이 발송 제외 상태입니다 — 최소 1개는 포함해야 합니다")
     return errors, warnings, report
 
+
+# ══════════════════════ 인자 파싱 · 채널 진단 ══════════════════════
 
 def parse_args():
     p = argparse.ArgumentParser(description="korjobs 디스코드 승인·발송 봇")
@@ -220,6 +234,8 @@ def run_list_channels():
         fail("봇 토큰이 잘못되었습니다. 개발자 포털 > Bot > Reset Token 으로 재발급 후 .env 를 갱신하세요.")
 
 
+# ══════════════════════ 메인 (검증 → 승인 대기 → 발송) ══════════════════════
+
 def main():
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -267,6 +283,7 @@ def main():
     if payload.get("status") == "sent" and not args.force:
         fail(f"이미 {payload.get('sent_at')} 에 발송된 회차입니다. 재발송하려면 --force 를 붙이세요.")
 
+    # ── 환경변수(.env) 로딩 ──
     # 여기서부터만 discord/dotenv 의존 (dry-run 은 의존성 설치 없이도 동작)
     import discord  # noqa: E402
     from dotenv import load_dotenv  # noqa: E402
@@ -289,9 +306,12 @@ def main():
     except ValueError:
         fail("APPROVER_IDS 는 콤마로 구분한 숫자 유저 ID 여야 합니다.")
 
-    # ── 이하 디스코드 상호작용 ──────────────────────────────────────────
+    # ══ 이하 디스코드 상호작용 (State·미리보기·UI·발송 흐름) ══
 
+    # ── 실행 상태(State) ──
     class State:
+        """이번 실행의 가변 상태 — 미리보기 메시지, 승인 잠금, 라우팅 오버라이드를 담는다."""
+
         def __init__(self):
             self.payload = payload
             self.path = path
@@ -308,6 +328,7 @@ def main():
                 return self.route_overrides[key]
             return standing_routes.get(key) or [announce_id]
 
+    # ── 미리보기 렌더링 (preview_content / build_embed) ──
     def preview_content(m: dict, targets: list):
         """승인 채널 미리보기용 content — 제외 마커와 (기본값이 아닐 때만) 발송 대상 채널을 표시."""
         lines = []
@@ -332,7 +353,10 @@ def main():
             embed.set_footer(text=e["footer"])
         return embed
 
+    # ── 편집 UI (✏️ 제목/내용/헤더 수정) ──
     class SectionEditModal(discord.ui.Modal):
+        """섹션 제목·내용(top3는 브리핑 헤더까지) 편집 모달."""
+
         def __init__(self, state: State, key: str):
             m = state.message_by_key(key)
             super().__init__(title=f"✏️ {m['embed']['title']}"[:45])
@@ -411,6 +435,8 @@ def main():
     HEADER_OPTION = "_header"
 
     class SectionSelect(discord.ui.Select):
+        """✏️ 편집 대상 선택 — 브리핑 헤더 또는 6개 섹션 중 하나를 골라 해당 모달을 연다."""
+
         def __init__(self, state: State):
             self.state = state
             options = [discord.SelectOption(
@@ -434,7 +460,10 @@ def main():
             super().__init__(timeout=600)
             self.add_item(SectionSelect(state))
 
+    # ── 섹션 제외 UI (🚫 발송 대상 섹션 고르기) ──
     class SectionToggleSelect(discord.ui.Select):
+        """발송할 섹션만 다중 선택 — 선택 해제한 섹션은 발송에서 제외된다."""
+
         def __init__(self, state: State):
             self.state = state
             options = [
@@ -482,7 +511,10 @@ def main():
             super().__init__(timeout=600)
             self.add_item(SectionToggleSelect(state))
 
+    # ── 발송 채널 라우팅 UI (📨 섹션별 대상 채널 변경) ──
     class RouteChannelSelect(discord.ui.ChannelSelect):
+        """한 섹션의 발송 채널을 고르는 채널 선택기 (모두 해제 = 기본 공지 채널로 복원)."""
+
         def __init__(self, state: State, key: str, default_ids: list):
             self.state, self.key = state, key
             super().__init__(
@@ -536,6 +568,8 @@ def main():
             self.add_item(RouteChannelSelect(state, key, default_ids))
 
     class RouteSectionSelect(discord.ui.Select):
+        """📨 발송 채널을 바꿀 섹션을 먼저 고르는 선택기 → 채널 선택기로 이어진다."""
+
         def __init__(self, state: State):
             self.state = state
             options = []
@@ -564,7 +598,10 @@ def main():
             super().__init__(timeout=600)
             self.add_item(RouteSectionSelect(state))
 
+    # ── 승인 버튼 뷰 (✅승인 · ✏️편집 · 🚫제외 · 📨채널 · ❌반려) ──
     class ApprovalView(discord.ui.View):
+        """컨트롤 메시지에 붙는 버튼 묶음 — 승인/편집/제외/라우팅/반려. approver_ids 로 권한 제한."""
+
         def __init__(self, state: State, timeout: float):
             super().__init__(timeout=timeout)
             self.state = state
@@ -624,7 +661,9 @@ def main():
             self.result, self.actor = "rejected", interaction.user.display_name
             self.stop()
 
+    # ── 채널 해석 · 승인 대기 · 발송 흐름 (run_flow) ──
     async def fetch_text_channel(client: discord.Client, channel_id: int, name: str):
+        """채널 ID 를 실제 채널 객체로 해석 — 없거나 접근 불가면 한국어 사유와 함께 RuntimeError."""
         try:
             channel = client.get_channel(channel_id) or await client.fetch_channel(channel_id)
         except discord.NotFound:
@@ -636,6 +675,7 @@ def main():
         return channel
 
     async def run_flow(client: discord.Client, state: State) -> int:
+        """승인 채널에 미리보기+버튼을 올리고, 결과(승인/편집/제외/반려/시간초과)에 따라 발송·기록. 종료 코드 반환."""
         approval = await fetch_text_channel(client, approval_id, "승인")
         announce = await fetch_text_channel(client, announce_id, "공지")
 
@@ -727,7 +767,10 @@ def main():
         print(f"발송 완료 (by {view.actor}) — {summary}, status=sent 기록.")
         return 0
 
+    # ── 디스코드 클라이언트 · 실행 ──
     class SenderClient(discord.Client):
+        """접속되면 run_flow 를 1회 실행하고 그 종료 코드를 들고 종료하는 1회성 클라이언트."""
+
         def __init__(self):
             super().__init__(intents=discord.Intents.default())  # 특권 인텐트 불필요
             self.exit_code = 3
