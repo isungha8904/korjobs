@@ -2,7 +2,8 @@
 """korjobs 디스코드 승인·발송 봇.
 
 broadcast/<date>-discord.json 을 읽어 승인 채널에 미리보기를 올리고,
-✅승인 / ✏️편집 / ❌반려 버튼 인터랙션을 처리한 뒤 승인 시 공지 채널로 발송한다.
+✅승인 / ✏️편집 / 🚫섹션 제외 / 📨발송 채널(라우팅) / ❌반려 버튼 인터랙션을 처리한 뒤
+승인 시 섹션별 대상 채널(bot/routes.json + 즉석 변경, 기본은 공지 채널)로 발송한다.
 상주 봇이 아니라 실행 → 승인 대기 → 발송 → 종료하는 1회성 스크립트.
 
 사용법:
@@ -67,6 +68,45 @@ def load_payload(date: str):
 
 def save_payload(path: Path, payload: dict):
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+ROUTES_PATH = REPO_ROOT / "bot" / "routes.json"
+
+
+def load_routes():
+    """bot/routes.json → (routes: dict[key, list[int]], errors, warnings). 파일 없으면 전부 기본 채널."""
+    errors, warnings = [], []
+    if not ROUTES_PATH.exists():
+        return {}, errors, warnings
+    try:
+        raw = json.loads(ROUTES_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        return {}, [f"bot/routes.json 파싱 실패: {e}"], warnings
+    if not isinstance(raw, dict):
+        return {}, ["bot/routes.json 최상위는 객체(섹션 key → 채널 ID 목록)여야 합니다"], warnings
+    routes = {}
+    for key, value in raw.items():
+        if key not in SECTION_ORDER:
+            errors.append(f"bot/routes.json: 알 수 없는 섹션 key '{key}' (가능: {', '.join(SECTION_ORDER)})")
+            continue
+        if not isinstance(value, list):
+            errors.append(f"bot/routes.json: '{key}' 값은 채널 ID 목록이어야 합니다")
+            continue
+        if not value:
+            errors.append(f"bot/routes.json: '{key}' 가 빈 목록 — 섹션을 기본 채널로 보내려면 키를 삭제하세요")
+            continue
+        ids = []
+        for item in value:
+            s = str(item)
+            if not s.isdigit():
+                errors.append(f"bot/routes.json: '{key}' 의 채널 ID '{item}' 는 숫자여야 합니다")
+            elif int(s) in ids:
+                warnings.append(f"bot/routes.json: '{key}' 에 중복 채널 ID {s} — 한 번만 발송합니다")
+            else:
+                ids.append(int(s))
+        if ids:
+            routes[key] = ids
+    return routes, errors, warnings
 
 
 def validate(payload: dict):
@@ -134,8 +174,17 @@ def main():
         payload["edit_log"] = []  # 봇이 기록하는 필드 — 없거나 깨져 있으면 초기화
 
     errors, warnings, report = validate(payload)
+    standing_routes, r_errors, r_warnings = load_routes()
+    errors += r_errors
+    warnings += r_warnings
     print(f"── {args.date} 디스코드 배포판 검증 ──")
     print("\n".join(report))
+    print("── 발송 채널 라우팅 (bot/routes.json) ──")
+    for key in SECTION_ORDER:
+        # dry-run 은 .env 를 읽지 않으므로 기본 채널은 상징 라벨로 표기
+        targets = standing_routes.get(key)
+        label = " ".join(f"<#{c}>" for c in targets) if targets else "기본 공지 채널 (ANNOUNCE_CHANNEL_ID)"
+        print(f"  [{key:8s}] {label}")
     for w in warnings:
         print(f"경고: {w}")
     if errors:
@@ -183,16 +232,26 @@ def main():
             self.preview_msgs = {}       # key -> discord.Message (승인 채널 미리보기)
             self.locked = False          # 승인/반려 후 편집 차단
             self.approve_interaction = None
+            self.route_overrides = {}    # key -> [채널ID int] — 이번 실행에만 적용, routes.json 은 안 건드림
 
         def message_by_key(self, key: str) -> dict:
             return next(m for m in self.payload["messages"] if m["key"] == key)
 
-    def preview_content(m: dict):
-        """승인 채널 미리보기용 content — 제외된 섹션에는 표시를 붙인다."""
-        base = m.get("content")
+        def targets_for(self, key: str) -> list:
+            if key in self.route_overrides:
+                return self.route_overrides[key]
+            return standing_routes.get(key) or [announce_id]
+
+    def preview_content(m: dict, targets: list):
+        """승인 채널 미리보기용 content — 제외 마커와 (기본값이 아닐 때만) 발송 대상 채널을 표시."""
+        lines = []
         if m.get("excluded"):
-            marker = "🚫 **이 섹션은 발송에서 제외됩니다**"
-            return f"{marker}\n{base}" if base else marker
+            lines.append("🚫 **이 섹션은 발송에서 제외됩니다**")
+        if targets != [announce_id]:
+            lines.append("📨 **발송 대상:** " + " ".join(f"<#{c}>" for c in targets))
+        base = m.get("content")
+        if lines:
+            return "\n".join(lines + ([base] if base else []))
         return base
 
     def build_embed(m: dict) -> discord.Embed:
@@ -238,7 +297,8 @@ def main():
                                    "title": self.title_input.value,
                                    "description": self.desc_input.value}}
             # 미리보기 반영이 성공한 경우에만 payload 에 커밋 — 미리보기와 발송 내용이 항상 일치하도록
-            await self.state.preview_msgs[self.key].edit(content=preview_content(candidate), embed=build_embed(candidate))
+            await self.state.preview_msgs[self.key].edit(
+                content=preview_content(candidate, self.state.targets_for(self.key)), embed=build_embed(candidate))
             m["embed"]["title"] = candidate["embed"]["title"]
             m["embed"]["description"] = candidate["embed"]["description"]
             if self.content_input is not None:
@@ -270,7 +330,8 @@ def main():
                 return
             m = self.state.message_by_key("top3")
             candidate = {**m, "content": self.header_input.value or None}
-            await self.state.preview_msgs["top3"].edit(content=preview_content(candidate), embed=build_embed(candidate))
+            await self.state.preview_msgs["top3"].edit(
+                content=preview_content(candidate, self.state.targets_for("top3")), embed=build_embed(candidate))
             m["content"] = candidate["content"]
             self.state.payload["edit_log"].append({
                 "key": "top3",
@@ -335,7 +396,8 @@ def main():
                     changed.append((m["key"], new_excluded))
             for key, _ in changed:
                 m = self.state.message_by_key(key)
-                await self.state.preview_msgs[key].edit(content=preview_content(m), embed=build_embed(m))
+                await self.state.preview_msgs[key].edit(
+                    content=preview_content(m, self.state.targets_for(key)), embed=build_embed(m))
             for key, excluded in changed:
                 self.state.payload["edit_log"].append({
                     "key": key,
@@ -353,6 +415,88 @@ def main():
         def __init__(self, state: State):
             super().__init__(timeout=600)
             self.add_item(SectionToggleSelect(state))
+
+    class RouteChannelSelect(discord.ui.ChannelSelect):
+        def __init__(self, state: State, key: str, default_ids: list):
+            self.state, self.key = state, key
+            super().__init__(
+                channel_types=[discord.ChannelType.text, discord.ChannelType.news],
+                placeholder="발송할 채널 선택 (모두 해제 = 기본값 복원)",
+                min_values=0, max_values=25,
+                default_values=[discord.Object(id=c) for c in default_ids])
+
+        async def callback(self, interaction: discord.Interaction):
+            if self.state.locked:
+                await interaction.response.send_message("이미 승인/반려되어 변경할 수 없습니다.", ephemeral=True)
+                return
+            await interaction.response.defer(ephemeral=True)  # 권한 검사 + 미리보기 수정 + 저장에 3초 이상 걸릴 수 있음
+            # self.values 는 AppCommandChannel — Messageable 이 아니므로 .id 만 쓰고 발송 시 재해석
+            picked = [c.id for c in self.values]
+            # 선택 목록은 '사용자가 보는 채널' 기준이라 봇이 못 쓰는 채널이 섞일 수 있음 → 즉시 검사
+            bad = []
+            for cid in picked:
+                ch = interaction.client.get_channel(cid)
+                if ch is None or not ch.permissions_for(ch.guild.me).send_messages:
+                    bad.append(cid)
+            if bad:
+                await interaction.followup.send(
+                    "⚠️ 봇이 접근/발송할 수 없는 채널이 있어 반영하지 않았습니다: "
+                    + " ".join(f"<#{c}>" for c in bad)
+                    + "\n채널 권한에 봇을 추가한 뒤 다시 시도하세요.", ephemeral=True)
+                return
+            if picked:
+                self.state.route_overrides[self.key] = picked
+            else:
+                self.state.route_overrides.pop(self.key, None)  # 전부 해제 = 기본값 복원
+            m = self.state.message_by_key(self.key)
+            targets = self.state.targets_for(self.key)
+            await self.state.preview_msgs[self.key].edit(
+                content=preview_content(m, targets), embed=build_embed(m))
+            self.state.payload["edit_log"].append({
+                "key": self.key,
+                "editor": interaction.user.display_name,
+                "edited_at": now_iso(),
+                "action": "route",
+                "channels": [str(c) for c in targets],
+            })
+            save_payload(self.state.path, self.state.payload)
+            label = " ".join(f"<#{c}>" for c in picked) if picked else "기본값 복원 (공지 채널)"
+            await interaction.followup.send(
+                f"📨 '{m['embed']['title']}' 발송 대상 → {label}", ephemeral=True)
+
+    class RouteChannelView(discord.ui.View):
+        def __init__(self, state: State, key: str, default_ids: list):
+            super().__init__(timeout=600)
+            self.add_item(RouteChannelSelect(state, key, default_ids))
+
+    class RouteSectionSelect(discord.ui.Select):
+        def __init__(self, state: State):
+            self.state = state
+            options = []
+            for k in SECTION_ORDER:
+                targets = state.targets_for(k)
+                desc = "현재: 기본 공지 채널" if targets == [announce_id] else f"현재: {len(targets)}개 채널 지정"
+                options.append(discord.SelectOption(
+                    label=state.message_by_key(k)["embed"]["title"][:100], value=k, description=desc))
+            super().__init__(placeholder="발송 채널을 바꿀 섹션 선택", options=options)
+
+        async def callback(self, interaction: discord.Interaction):
+            if self.state.locked:
+                await interaction.response.send_message("이미 승인/반려되어 변경할 수 없습니다.", ephemeral=True)
+                return
+            key = self.values[0]
+            # default_values 에 길드에 없는 채널 ID 가 섞이면 400 에러 → 캐시로 확인되는 것만 프리필
+            default_ids = [c for c in self.state.targets_for(key)
+                           if interaction.client.get_channel(c) is not None]
+            title = self.state.message_by_key(key)["embed"]["title"]
+            await interaction.response.edit_message(
+                content=f"📨 '{title}' 섹션의 발송 채널을 선택하세요 (모두 해제 = 기본값 복원):",
+                view=RouteChannelView(self.state, key, default_ids))
+
+    class RoutePickView(discord.ui.View):
+        def __init__(self, state: State):
+            super().__init__(timeout=600)
+            self.add_item(RouteSectionSelect(state))
 
     class ApprovalView(discord.ui.View):
         def __init__(self, state: State, timeout: float):
@@ -395,6 +539,15 @@ def main():
                 "발송할 섹션만 선택하세요 (선택 해제한 섹션은 발송에서 제외):",
                 view=SectionToggleView(self.state), ephemeral=True)
 
+        @discord.ui.button(label="발송 채널", emoji="📨", style=discord.ButtonStyle.secondary)
+        async def route_sections(self, interaction: discord.Interaction, _button: discord.ui.Button):
+            # row 0 에 버튼 5개 = 디스코드 한도 — 6번째 액션을 추가하려면 row= 지정 필요
+            if self.state.locked:
+                await interaction.response.send_message("이미 처리된 요청입니다.", ephemeral=True)
+                return
+            await interaction.response.send_message(
+                "발송 채널을 바꿀 섹션을 선택하세요:", view=RoutePickView(self.state), ephemeral=True)
+
         @discord.ui.button(label="반려", emoji="❌", style=discord.ButtonStyle.danger)
         async def reject(self, interaction: discord.Interaction, _button: discord.ui.Button):
             if self.state.locked:
@@ -423,10 +576,10 @@ def main():
         await approval.send(
             f"📋 **{args.date} 다이제스트 승인 요청**\n"
             f"아래 미리보기 {len(SECTION_ORDER)}개 섹션을 확인하고 맨 아래 버튼을 사용하세요:\n"
-            f"✅ 승인 후 발송 · ✏️ 편집(제목/내용/헤더 수정) · 🚫 섹션 제외/복원 · ❌ 반려\n"
+            f"✅ 승인 후 발송 · ✏️ 편집(제목/내용/헤더) · 🚫 섹션 제외/복원 · 📨 발송 채널 · ❌ 반려\n"
             f"⏰ 대기 시간: {fmt_duration(args.timeout)}")
         for m in state.payload["messages"]:
-            msg = await approval.send(content=preview_content(m), embed=build_embed(m))
+            msg = await approval.send(content=preview_content(m, state.targets_for(m["key"])), embed=build_embed(m))
             state.preview_msgs[m["key"]] = msg
 
         view = ApprovalView(state, timeout=args.timeout)
@@ -456,37 +609,56 @@ def main():
             print(f"반려됨 (by {view.actor}) — status=rejected 기록.")
             return 1
 
-        # approved — 제외되지 않은 섹션만 발송
+        # approved — 제외되지 않은 섹션만, 섹션별 라우팅 대상 채널로 발송
         to_send = [m for m in state.payload["messages"] if not m.get("excluded")]
         skipped = len(state.payload["messages"]) - len(to_send)
-        total = len(to_send)
-        sent_ids = []
+        plan = [(m, state.targets_for(m["key"])) for m in to_send]
+        total_planned = sum(len(targets) for _, targets in plan)
+
+        # 발송 전 모든 대상 채널을 먼저 해석 — 실패 시 0건 발송 상태로 중단 (멱등성 보존)
+        channels = {announce_id: announce}
         try:
-            for m in to_send:
-                sent = await announce.send(content=m.get("content"), embed=build_embed(m))
-                sent_ids.append(sent.id)
+            for m, targets in plan:
+                for cid in targets:
+                    if cid not in channels:
+                        channels[cid] = await fetch_text_channel(client, cid, f"[{m['key']}] 라우팅")
+        except RuntimeError as e:
+            warn = f"⚠️ 발송 중단(발송 전) — {e} (아무것도 발송되지 않음, status 는 draft 유지)"
+            await edit_control(warn)
+            print(warn)
+            return 1
+
+        sent_records = []  # {"key", "channel_id", "message_id"} — ID 는 문자열(2^53 초과 대비)
+        try:
+            for m, targets in plan:  # 섹션 순서 우선 — 모든 방에서 읽기 순서 보존
+                for cid in targets:
+                    sent = await channels[cid].send(content=m.get("content"), embed=build_embed(m))
+                    sent_records.append({"key": m["key"], "channel_id": str(cid), "message_id": str(sent.id)})
         except discord.HTTPException as e:
-            # 부분 발송: 나간 메시지 ID 는 기록하되 status 는 draft 유지 → 재실행 전 공지 채널 정리 필요
-            state.payload["announce_message_ids"] = sent_ids
+            # 부분 발송: 나간 (섹션, 채널) 쌍까지 기록하되 status 는 draft 유지
+            state.payload["sent_messages"] = sent_records
             save_payload(state.path, state.payload)
-            warn = (f"⚠️ 발송 중단 — {len(sent_ids)}/{total}개 발송 후 실패: {e}\n"
-                    f"공지 채널에 이미 나간 메시지를 확인·정리한 뒤 재실행하세요. (status 는 draft 유지)")
+            warn = (f"⚠️ 발송 중단 — [{m['key']}] → <#{cid}> 발송 실패: {e}\n"
+                    f"{len(sent_records)}/{total_planned}건 발송됨. 이미 나간 메시지를 정리한 뒤 재실행하세요. "
+                    f"(status 는 draft 유지 — 재실행하면 전체가 다시 발송됩니다)")
             await edit_control(warn)
             print(warn)
             return 3
         state.payload["status"] = "sent"
         state.payload["sent_at"] = now_iso()
-        state.payload["announce_message_ids"] = sent_ids
+        state.payload["sent_messages"] = sent_records
+        state.payload.pop("announce_message_ids", None)  # 구버전 필드 정리
         save_payload(state.path, state.payload)
+        n_channels = len({r["channel_id"] for r in sent_records})
         skipped_note = f" (제외 {skipped}개)" if skipped else ""
-        await edit_control(f"✅ 발송 완료 — {view.actor} 승인 · 공지 채널에 {len(sent_ids)}개 메시지{skipped_note}")
+        summary = f"{n_channels}개 채널에 {len(sent_records)}개 메시지{skipped_note}"
+        await edit_control(f"✅ 발송 완료 — {view.actor} 승인 · {summary}")
         if state.approve_interaction:
             try:
-                await state.approve_interaction.followup.send(
-                    f"✅ 공지 채널로 {len(sent_ids)}개 메시지를 발송했습니다.{skipped_note}", ephemeral=True)
+                await state.approve_interaction.followup.send(f"✅ {summary}를 발송했습니다.", ephemeral=True)
             except discord.HTTPException as e:
                 print(f"경고: 승인자 확인 메시지 전송 실패 (발송은 완료됨): {e}")
-        print(f"발송 완료 (by {view.actor}) — 메시지 {len(sent_ids)}개{skipped_note}, status=sent 기록.")
+        print(f"발송 완료 (by {view.actor}) — {summary}, status=sent 기록.")
         return 0
 
     class SenderClient(discord.Client):

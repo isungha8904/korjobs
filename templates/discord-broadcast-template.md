@@ -85,6 +85,6 @@
   ],
   "edit_log": [],
   "sent_at": null,
-  "announce_message_ids": []
+  "sent_messages": []
 }
 ```

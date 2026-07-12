@@ -98,7 +98,7 @@ data/<YYYY-MM-DD>/
   ],
   "edit_log": [],
   "sent_at": null,
-  "announce_message_ids": []
+  "sent_messages": []
 }
 ```
 
@@ -116,10 +116,24 @@ data/<YYYY-MM-DD>/
 | `embed.footer` | ≤ 2,048자 | 선택. `korjobs · YYYY-MM-DD` 권장 |
 | `messages[].excluded` | bool, 선택 | **봇이 승인 단계에서 설정** — `true`면 승인 시 그 섹션은 발송에서 제외(파일에는 남음). `/format-discord`는 이 필드를 넣지 않음. 6개 전부 `true`면 검증 오류 |
 | `status` | enum | 라이프사이클: `draft` → `sent` 또는 `rejected`. 봇만 변경 |
-| `edit_log[]` | — | 봇이 기록: `{ "key": "...", "editor": "유저명", "edited_at": "ISO시각", "action": "exclude"/"include"/"edit-header"(해당 동작 시에만) }` |
-| `sent_at` / `announce_message_ids` | — | 봇이 발송 성공 시 기록 |
+| `edit_log[]` | — | 봇이 기록: `{ "key": "...", "editor": "유저명", "edited_at": "ISO시각", "action": "exclude"/"include"/"edit-header"/"route"(해당 동작 시에만), "channels": ["채널ID 문자열"]("route" 시에만) }` |
+| `sent_at` / `sent_messages[]` | — | 봇이 발송 성공 시 기록. `sent_messages` 는 (섹션, 채널)쌍별: `{ "key": "top3", "channel_id": "111...", "message_id": "999..." }` — **ID 는 문자열** (스노플레이크가 2^53 을 넘어 JS 도구를 거치면 깨질 수 있음) |
 
 의도적 단순화: `fields[]`를 쓰지 않고 **description 단일 문단만** 사용합니다 — 승인 봇의 편집 모달 입력 1개에 섹션 전체가 들어가야 하기 때문입니다.
+
+### bot/routes.json — 섹션별 발송 채널 라우팅
+
+```json
+{
+  "career": ["123456789012345678", "234567890123456789"],
+  "glossary": ["345678901234567890"]
+}
+```
+
+- 섹션 key → **채널 ID 문자열 목록**. 목록에 있는 모든 채널로 복제 발송됩니다.
+- **여기 없는 섹션은 기본 공지 채널(`ANNOUNCE_CHANNEL_ID`)로** 발송. 파일이 아예 없어도 됩니다.
+- 검증: 알 수 없는 key·비목록·비숫자 ID·빈 목록 = 오류(발송 차단), 중복 ID = 경고 + 1회만 발송.
+- 승인 화면의 📨 버튼으로 **이번 실행에 한해** 라우팅을 바꿀 수 있습니다 — routes.json 은 변경되지 않고, 변경 내역은 `edit_log`(`action: "route"`)에 남습니다. 영구 규칙은 이 파일을 수정해 커밋하세요.
 
 ## 검증 규칙 (모든 컴포넌트 공통)
 - 링크는 항상 원문/공식 발표 직접 URL. 언론사 홈·뉴스 모음·채널 홈·재생목록 금지.
