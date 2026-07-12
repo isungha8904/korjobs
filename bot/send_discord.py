@@ -86,7 +86,8 @@ def validate(payload: dict):
         content = m.get("content") or ""
         footer = embed.get("footer") or ""
         report.append(f"  [{key:8s}] 제목 {len(title):3d}/{TITLE_LIMIT} · 본문 {len(desc):4d}/{DESC_SOFT_LIMIT}"
-                      + (f" · 헤더 {len(content)}/{CONTENT_LIMIT}" if content else ""))
+                      + (f" · 헤더 {len(content)}/{CONTENT_LIMIT}" if content else "")
+                      + (" · 🚫 발송 제외" if m.get("excluded") else ""))
         if not title:
             errors.append(f"[{key}] embed.title 이 비어 있음")
         if len(title) > TITLE_LIMIT:
@@ -107,6 +108,8 @@ def validate(payload: dict):
         color = embed.get("color")
         if color is not None and not isinstance(color, int):
             errors.append(f"[{key}] color 는 10진수 정수여야 함: {color!r}")
+    if msgs and all(m.get("excluded") for m in msgs):
+        errors.append("모든 섹션이 발송 제외 상태입니다 — 최소 1개는 포함해야 합니다")
     return errors, warnings, report
 
 
@@ -184,6 +187,14 @@ def main():
         def message_by_key(self, key: str) -> dict:
             return next(m for m in self.payload["messages"] if m["key"] == key)
 
+    def preview_content(m: dict):
+        """승인 채널 미리보기용 content — 제외된 섹션에는 표시를 붙인다."""
+        base = m.get("content")
+        if m.get("excluded"):
+            marker = "🚫 **이 섹션은 발송에서 제외됩니다**"
+            return f"{marker}\n{base}" if base else marker
+        return base
+
     def build_embed(m: dict) -> discord.Embed:
         e = m["embed"]
         embed = discord.Embed(
@@ -212,7 +223,7 @@ def main():
             self.content_input = None
             if "content" in m:  # 값을 비워도 키는 남으므로, 실수로 지운 헤더를 다시 복구할 수 있다
                 self.content_input = discord.ui.TextInput(
-                    label="헤더 (임베드 위 일반 텍스트)", style=discord.TextStyle.paragraph,
+                    label="브리핑 헤더 (카드 위에 뜨는 첫 줄)", style=discord.TextStyle.paragraph,
                     default=m.get("content") or "", max_length=CONTENT_LIMIT, required=False)
                 self.add_item(self.content_input)
 
@@ -227,7 +238,7 @@ def main():
                                    "title": self.title_input.value,
                                    "description": self.desc_input.value}}
             # 미리보기 반영이 성공한 경우에만 payload 에 커밋 — 미리보기와 발송 내용이 항상 일치하도록
-            await self.state.preview_msgs[self.key].edit(content=candidate.get("content"), embed=build_embed(candidate))
+            await self.state.preview_msgs[self.key].edit(content=preview_content(candidate), embed=build_embed(candidate))
             m["embed"]["title"] = candidate["embed"]["title"]
             m["embed"]["description"] = candidate["embed"]["description"]
             if self.content_input is not None:
@@ -258,6 +269,53 @@ def main():
         def __init__(self, state: State):
             super().__init__(timeout=600)
             self.add_item(SectionSelect(state))
+
+    class SectionToggleSelect(discord.ui.Select):
+        def __init__(self, state: State):
+            self.state = state
+            options = [
+                discord.SelectOption(
+                    label=state.message_by_key(k)["embed"]["title"][:100], value=k,
+                    default=not state.message_by_key(k).get("excluded"),
+                    description="현재: 발송 제외" if state.message_by_key(k).get("excluded") else "현재: 발송",
+                )
+                for k in SECTION_ORDER
+            ]
+            super().__init__(placeholder="발송할 섹션만 선택 (선택 해제 = 제외)",
+                             options=options, min_values=1, max_values=len(SECTION_ORDER))
+
+        async def callback(self, interaction: discord.Interaction):
+            if self.state.locked:
+                await interaction.response.send_message("이미 승인/반려되어 변경할 수 없습니다.", ephemeral=True)
+                return
+            await interaction.response.defer(ephemeral=True)  # 미리보기 여러 개 수정에 3초 이상 걸릴 수 있음
+            included = set(self.values)
+            changed = []
+            for m in self.state.payload["messages"]:
+                new_excluded = m["key"] not in included
+                if bool(m.get("excluded")) != new_excluded:
+                    m["excluded"] = new_excluded
+                    changed.append((m["key"], new_excluded))
+            for key, _ in changed:
+                m = self.state.message_by_key(key)
+                await self.state.preview_msgs[key].edit(content=preview_content(m), embed=build_embed(m))
+            for key, excluded in changed:
+                self.state.payload["edit_log"].append({
+                    "key": key,
+                    "editor": interaction.user.display_name,
+                    "edited_at": now_iso(),
+                    "action": "exclude" if excluded else "include",
+                })
+            if changed:
+                save_payload(self.state.path, self.state.payload)
+            n = sum(1 for m in self.state.payload["messages"] if not m.get("excluded"))
+            await interaction.followup.send(
+                f"✅ 발송 대상 갱신 — {n}/{len(SECTION_ORDER)}개 섹션 발송 예정", ephemeral=True)
+
+    class SectionToggleView(discord.ui.View):
+        def __init__(self, state: State):
+            super().__init__(timeout=600)
+            self.add_item(SectionToggleSelect(state))
 
     class ApprovalView(discord.ui.View):
         def __init__(self, state: State, timeout: float):
@@ -291,6 +349,15 @@ def main():
             await interaction.response.send_message(
                 "수정할 섹션을 선택하세요:", view=SectionPickView(self.state), ephemeral=True)
 
+        @discord.ui.button(label="섹션 제외/복원", emoji="🚫", style=discord.ButtonStyle.secondary)
+        async def toggle_sections(self, interaction: discord.Interaction, _button: discord.ui.Button):
+            if self.state.locked:
+                await interaction.response.send_message("이미 처리된 요청입니다.", ephemeral=True)
+                return
+            await interaction.response.send_message(
+                "발송할 섹션만 선택하세요 (선택 해제한 섹션은 발송에서 제외):",
+                view=SectionToggleView(self.state), ephemeral=True)
+
         @discord.ui.button(label="반려", emoji="❌", style=discord.ButtonStyle.danger)
         async def reject(self, interaction: discord.Interaction, _button: discord.ui.Button):
             if self.state.locked:
@@ -318,10 +385,11 @@ def main():
 
         await approval.send(
             f"📋 **{args.date} 다이제스트 승인 요청**\n"
-            f"아래 미리보기 {len(SECTION_ORDER)}개 섹션을 확인하고 맨 아래 버튼으로 승인/편집/반려하세요.\n"
+            f"아래 미리보기 {len(SECTION_ORDER)}개 섹션을 확인하고 맨 아래 버튼을 사용하세요:\n"
+            f"✅ 승인 후 발송 · ✏️ 편집(제목/내용/헤더 수정) · 🚫 섹션 제외/복원 · ❌ 반려\n"
             f"⏰ 대기 시간: {fmt_duration(args.timeout)}")
         for m in state.payload["messages"]:
-            msg = await approval.send(content=m.get("content"), embed=build_embed(m))
+            msg = await approval.send(content=preview_content(m), embed=build_embed(m))
             state.preview_msgs[m["key"]] = msg
 
         view = ApprovalView(state, timeout=args.timeout)
@@ -351,11 +419,13 @@ def main():
             print(f"반려됨 (by {view.actor}) — status=rejected 기록.")
             return 1
 
-        # approved
-        total = len(state.payload["messages"])
+        # approved — 제외되지 않은 섹션만 발송
+        to_send = [m for m in state.payload["messages"] if not m.get("excluded")]
+        skipped = len(state.payload["messages"]) - len(to_send)
+        total = len(to_send)
         sent_ids = []
         try:
-            for m in state.payload["messages"]:
+            for m in to_send:
                 sent = await announce.send(content=m.get("content"), embed=build_embed(m))
                 sent_ids.append(sent.id)
         except discord.HTTPException as e:
@@ -371,14 +441,15 @@ def main():
         state.payload["sent_at"] = now_iso()
         state.payload["announce_message_ids"] = sent_ids
         save_payload(state.path, state.payload)
-        await edit_control(f"✅ 발송 완료 — {view.actor} 승인 · 공지 채널에 {len(sent_ids)}개 메시지")
+        skipped_note = f" (제외 {skipped}개)" if skipped else ""
+        await edit_control(f"✅ 발송 완료 — {view.actor} 승인 · 공지 채널에 {len(sent_ids)}개 메시지{skipped_note}")
         if state.approve_interaction:
             try:
                 await state.approve_interaction.followup.send(
-                    f"✅ 공지 채널로 {len(sent_ids)}개 메시지를 발송했습니다.", ephemeral=True)
+                    f"✅ 공지 채널로 {len(sent_ids)}개 메시지를 발송했습니다.{skipped_note}", ephemeral=True)
             except discord.HTTPException as e:
                 print(f"경고: 승인자 확인 메시지 전송 실패 (발송은 완료됨): {e}")
-        print(f"발송 완료 (by {view.actor}) — 메시지 {len(sent_ids)}개, status=sent 기록.")
+        print(f"발송 완료 (by {view.actor}) — 메시지 {len(sent_ids)}개{skipped_note}, status=sent 기록.")
         return 0
 
     class SenderClient(discord.Client):

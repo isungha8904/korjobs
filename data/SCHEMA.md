@@ -114,8 +114,9 @@ data/<YYYY-MM-DD>/
 | `embed.url` | 유효 URL, 선택 | 제목을 클릭 가능하게 함. `top3`는 `digest_url` 사용 |
 | `embed.color` | 10진수 int | 섹션별 고정: top3 `15158332`(0xE74C3C) · news `3447003`(0x3498DB) · videos `15105570`(0xE67E22) · threads `10181046`(0x9B59B6) · career `3066993`(0x2ECC71) · glossary `9807270`(0x95A5A6) |
 | `embed.footer` | ≤ 2,048자 | 선택. `korjobs · YYYY-MM-DD` 권장 |
+| `messages[].excluded` | bool, 선택 | **봇이 승인 단계에서 설정** — `true`면 승인 시 그 섹션은 발송에서 제외(파일에는 남음). `/format-discord`는 이 필드를 넣지 않음. 6개 전부 `true`면 검증 오류 |
 | `status` | enum | 라이프사이클: `draft` → `sent` 또는 `rejected`. 봇만 변경 |
-| `edit_log[]` | — | 봇이 기록: `{ "key": "...", "editor": "유저명", "edited_at": "ISO시각" }` |
+| `edit_log[]` | — | 봇이 기록: `{ "key": "...", "editor": "유저명", "edited_at": "ISO시각", "action": "exclude"/"include"(섹션 제외/복원 시에만) }` |
 | `sent_at` / `announce_message_ids` | — | 봇이 발송 성공 시 기록 |
 
 의도적 단순화: `fields[]`를 쓰지 않고 **description 단일 문단만** 사용합니다 — 승인 봇의 편집 모달 입력 1개에 섹션 전체가 들어가야 하기 때문입니다.
