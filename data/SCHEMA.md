@@ -116,7 +116,7 @@ data/<YYYY-MM-DD>/
 | `embed.footer` | ≤ 2,048자 | 선택. `korjobs · YYYY-MM-DD` 권장 |
 | `messages[].excluded` | bool, 선택 | **봇이 승인 단계에서 설정** — `true`면 승인 시 그 섹션은 발송에서 제외(파일에는 남음). `/format-discord`는 이 필드를 넣지 않음. 6개 전부 `true`면 검증 오류 |
 | `status` | enum | 라이프사이클: `draft` → `sent` 또는 `rejected`. 봇만 변경 |
-| `edit_log[]` | — | 봇이 기록: `{ "key": "...", "editor": "유저명", "edited_at": "ISO시각", "action": "exclude"/"include"(섹션 제외/복원 시에만) }` |
+| `edit_log[]` | — | 봇이 기록: `{ "key": "...", "editor": "유저명", "edited_at": "ISO시각", "action": "exclude"/"include"/"edit-header"(해당 동작 시에만) }` |
 | `sent_at` / `announce_message_ids` | — | 봇이 발송 성공 시 기록 |
 
 의도적 단순화: `fields[]`를 쓰지 않고 **description 단일 문단만** 사용합니다 — 승인 봇의 편집 모달 입력 1개에 섹션 전체가 들어가야 하기 때문입니다.

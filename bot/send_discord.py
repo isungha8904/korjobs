@@ -252,18 +252,55 @@ def main():
             await interaction.response.send_message(
                 f"✅ '{m['embed']['title']}' 섹션 수정 완료 — 미리보기와 파일에 반영했습니다.", ephemeral=True)
 
+    class HeaderEditModal(discord.ui.Modal):
+        """맨 위 브리핑 헤더(top3 카드 위 일반 텍스트 첫 줄)만 빠르게 수정하는 모달."""
+
+        def __init__(self, state: State):
+            super().__init__(title="✏️ 브리핑 헤더 수정")
+            self.state = state
+            m = state.message_by_key("top3")
+            self.header_input = discord.ui.TextInput(
+                label="브리핑 헤더 (맨 위 첫 줄)", style=discord.TextStyle.paragraph,
+                default=m.get("content") or "", max_length=CONTENT_LIMIT, required=False)
+            self.add_item(self.header_input)
+
+        async def on_submit(self, interaction: discord.Interaction):
+            if self.state.locked:
+                await interaction.response.send_message("이미 승인/반려되어 반영할 수 없습니다.", ephemeral=True)
+                return
+            m = self.state.message_by_key("top3")
+            candidate = {**m, "content": self.header_input.value or None}
+            await self.state.preview_msgs["top3"].edit(content=preview_content(candidate), embed=build_embed(candidate))
+            m["content"] = candidate["content"]
+            self.state.payload["edit_log"].append({
+                "key": "top3",
+                "editor": interaction.user.display_name,
+                "edited_at": now_iso(),
+                "action": "edit-header",
+            })
+            save_payload(self.state.path, self.state.payload)
+            await interaction.response.send_message("✅ 브리핑 헤더 수정 완료 — 미리보기에 반영했습니다.", ephemeral=True)
+
+    HEADER_OPTION = "_header"
+
     class SectionSelect(discord.ui.Select):
         def __init__(self, state: State):
             self.state = state
-            options = [discord.SelectOption(label=state.message_by_key(k)["embed"]["title"][:100], value=k)
-                       for k in SECTION_ORDER]
-            super().__init__(placeholder="수정할 섹션 선택", options=options)
+            options = [discord.SelectOption(
+                label="🗞️ 브리핑 헤더 (맨 위 첫 줄)", value=HEADER_OPTION,
+                description="IT·AI 뉴스 브리핑 · 날짜 · 대상 독자 줄")]
+            options += [discord.SelectOption(label=state.message_by_key(k)["embed"]["title"][:100], value=k)
+                        for k in SECTION_ORDER]
+            super().__init__(placeholder="수정할 항목 선택", options=options)
 
         async def callback(self, interaction: discord.Interaction):
             if self.state.locked:
                 await interaction.response.send_message("이미 승인/반려되어 편집할 수 없습니다.", ephemeral=True)
                 return
-            await interaction.response.send_modal(SectionEditModal(self.state, self.values[0]))
+            if self.values[0] == HEADER_OPTION:
+                await interaction.response.send_modal(HeaderEditModal(self.state))
+            else:
+                await interaction.response.send_modal(SectionEditModal(self.state, self.values[0]))
 
     class SectionPickView(discord.ui.View):
         def __init__(self, state: State):
