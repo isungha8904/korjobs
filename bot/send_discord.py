@@ -9,7 +9,7 @@ broadcast/<date>-discord.json 을 읽어 승인 채널에 미리보기를 올리
     python bot/send_discord.py 2026-07-12
     python bot/send_discord.py 2026-07-12 --dry-run          # 네트워크 없이 검증만
     python bot/send_discord.py 2026-07-12 --force            # 이미 발송된 회차 재발송
-    python bot/send_discord.py 2026-07-12 --timeout 120      # 승인 대기 초 (기본 3600)
+    python bot/send_discord.py 2026-07-12 --timeout 120      # 승인 대기 초 (기본 86400 = 24시간)
 
 종료 코드: 0=발송 완료(또는 dry-run 통과) · 1=반려/입력 오류 · 2=승인 시간 초과 · 3=실행 중 예외
 """
@@ -34,6 +34,19 @@ EMBED_TOTAL_LIMIT = 6000  # 디스코드 임베드 합산(제목+본문+footer �
 
 def now_iso() -> str:
     return datetime.now().astimezone().isoformat(timespec="seconds")
+
+
+def fmt_duration(seconds: int) -> str:
+    h, rem = divmod(seconds, 3600)
+    m, s = divmod(rem, 60)
+    parts = []
+    if h:
+        parts.append(f"{h}시간")
+    if m:
+        parts.append(f"{m}분")
+    if s and not h:
+        parts.append(f"{s}초")
+    return " ".join(parts) or "0초"
 
 
 def fail(msg: str, code: int = 1):
@@ -102,7 +115,7 @@ def parse_args():
     p.add_argument("date", help="발송할 회차 날짜 (YYYY-MM-DD)")
     p.add_argument("--dry-run", action="store_true", help="디스코드 연결 없이 검증 리포트만 출력")
     p.add_argument("--force", action="store_true", help="status=sent 인 회차도 재발송 허용")
-    p.add_argument("--timeout", type=int, default=3600, help="승인 대기 시간(초), 기본 3600")
+    p.add_argument("--timeout", type=int, default=86400, help="승인 대기 시간(초), 기본 86400(24시간)")
     return p.parse_args()
 
 
@@ -306,7 +319,7 @@ def main():
         await approval.send(
             f"📋 **{args.date} 다이제스트 승인 요청**\n"
             f"아래 미리보기 {len(SECTION_ORDER)}개 섹션을 확인하고 맨 아래 버튼으로 승인/편집/반려하세요.\n"
-            f"⏰ 대기 시간: {args.timeout}초")
+            f"⏰ 대기 시간: {fmt_duration(args.timeout)}")
         for m in state.payload["messages"]:
             msg = await approval.send(content=m.get("content"), embed=build_embed(m))
             state.preview_msgs[m["key"]] = msg
