@@ -1,0 +1,44 @@
+{
+  "items": [
+    {
+      "title": "프론티어 모델 대전 재점화 — Claude Sonnet 5 · GPT-5.6 · Grok 4.5",
+      "level": "🔧",
+      "tldr": "코딩 에이전트 성능 상한이 또 올라갔다. 지금 쓰는 코딩 툴의 백엔드 모델을 재점검할 타이밍.",
+      "detail": "Claude Sonnet 5가 에이전트형 코딩·워크플로를 실무로 끌어내렸고(도입 특가 입력 $2 / 출력 $10 per 1M tokens, ~8/31), GPT-5.6 Sol이 Terminal-Bench 2.1에서 SOTA, Grok 4.5(1.5T)는 SpaceX·Tesla 사내 프라이빗 베타로 진입.",
+      "source_url": "https://www.anthropic.com/news/claude-sonnet-5",
+      "top3_candidate": true
+    },
+    {
+      "title": "백악관, OpenAI·Google·Anthropic과 '프론티어 모델 출시 자율 표준' 막판 조율",
+      "level": "🔧",
+      "tldr": "모델 배포·거버넌스 규칙 변화 → API 가용성·리전 제약에 직접 영향.",
+      "detail": "이번 주(7/7 주간) 발표 가능성. 새 프론티어 모델 출시 전 정부가 최대 30일간 국가안보 영향을 검토하는 구조. 미 상무부는 6/30 수출 규제를 풀었고, 7/1부터 Fable 5가 글로벌 서비스로 개방.",
+      "source_url": "https://www.tipranks.com/news/white-house-races-to-finalize-ai-model-rules-with-openai-google-and-anthropic",
+      "top3_candidate": true
+    },
+    {
+      "title": "딥시크, 추론(Inference) 특화 자체 AI 칩 개발 착수",
+      "level": "🔧",
+      "tldr": "추론 비용은 프로덕션 LLM 앱의 핵심 원가 — 칩 경쟁은 곧 서빙 단가 하락 신호.",
+      "detail": "약 1년 전부터 프로젝트 가동, 최근 반도체 설계 인력을 대거 흡수 중. 학습이 아닌 추론에 최적화 — 엔비디아·화웨이 종속성 탈피가 목표. 보도 직후 엔비디아 주가가 장 초반 2%대 하락.",
+      "source_url": "https://www.hankyung.com/article/202607071349i",
+      "top3_candidate": true
+    },
+    {
+      "title": "GPT-5.6 Sol / Terra / Luna 프리뷰 확정 — 일반 공개 7/9(목)",
+      "level": "🚀",
+      "tldr": "Sol=SOTA, Terra=이전급 성능에 값은 절반, Luna=가장 빠르고 쌈.",
+      "detail": "Sol(플래그십, $5/$30 per 1M tokens)은 복잡한 코딩·보안 연구용으로 Terminal-Bench 2.1 SOTA. Terra($2.5/$15)는 고볼륨 업무용, Luna($1/$6)는 요약·초안 등 일상 작업용.",
+      "source_url": "https://openai.com/index/previewing-gpt-5-6-sol/",
+      "top3_candidate": false
+    },
+    {
+      "title": "KT 에이블스쿨(AIVLE) 10기 모집 (~8/10)",
+      "level": "🌱",
+      "tldr": "청년 대상 무료 AI 개발자 양성 과정 — 입문·전향 진입 경로.",
+      "detail": "AI 개발자 트랙 + DX 컨설턴트 트랙, 9월 말 입교 후 6개월 과정. 만 34세 이하 미취업자 대상. 수료생 약 3,500명이 500여 개 기업 진출.",
+      "source_url": "https://aivle.kt.co.kr/",
+      "top3_candidate": false
+    }
+  ]
+}

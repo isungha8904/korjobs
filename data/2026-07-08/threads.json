@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "handle_or_tag": "@aiatmeta",
+      "summary": "Meta 공식 AI 계정. 최신 모델·연구 업데이트가 가장 먼저 뜨는 곳.",
+      "url": "https://www.threads.com/@aiatmeta"
+    },
+    {
+      "handle_or_tag": "#AICoding",
+      "summary": "요즘 화두는 \"에이전트가 되냐?\"가 아니라 \"어떻게 매일 쓸 만하게 만드냐\" — 릴리스 파이프라인, git에 메모리 묶기 같은 실전 팁이 인기 (2.02억 스레드).",
+      "url": "https://www.threads.com/tag/AI-Coding"
+    },
+    {
+      "handle_or_tag": "Threads × Meta AI 통합 테스트",
+      "summary": "공개 계정은 게시물/답글에서 @meta.ai 멘션으로 맥락·뉴스 질의 가능(Grok 유사). 소셜에 LLM이 스며드는 흐름.",
+      "url": "https://techcrunch.com/2026/05/12/threads-tests-a-meta-ai-integration-that-works-similarly-to-grok/"
+    }
+  ]
+}

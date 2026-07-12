@@ -1,0 +1,35 @@
+{
+  "items": [
+    {
+      "title": "How to Build AI Agents in 14 minutes Using Claude (for beginners)",
+      "level": "🌱",
+      "tldr": "14분 만에 Claude로 첫 에이전트를 만드는 입문 튜토리얼.",
+      "published_estimate": "추정 ~3주 전",
+      "runtime": "~14분",
+      "topics": ["Claude로 간단한 에이전트를 빠르게 조립", "도구 연결 후 동작 확인"],
+      "learn": "\"에이전트가 뭔지\"를 만들면서 체감 — 개념→첫 결과물까지 최단 경로.",
+      "audience": "AI 에이전트를 처음 만들어보는 사람",
+      "url": "https://www.youtube.com/watch?v=3MX7rVeVIYw"
+    },
+    {
+      "title": "How to Build Effective Claude Code Agents in 2026",
+      "level": "🔧",
+      "tldr": "실무에서 \"잘 되는\" Claude Code 에이전트·서브에이전트 설계법.",
+      "published_estimate": "추정 ~3주 전",
+      "topics": ["서브에이전트로 역할 분담, 도구·권한 범위 설정", "효과적인 프롬프트/컨텍스트 구성"],
+      "learn": "데모용이 아니라 반복 실무에 쓸 만한 에이전트 패턴.",
+      "audience": "Claude Code를 쓰기 시작했고 제대로 굴리는 법이 궁금한 개발자",
+      "url": "https://www.youtube.com/watch?v=RzLV8sfFdMM"
+    },
+    {
+      "title": "요즘 판교사투리 1. \"하네스 엔지니어링\" — 한국어",
+      "level": "🔧",
+      "tldr": "프롬프트 → 컨텍스트 다음 화두 '하네스' — 에이전트 성능을 좌우하는 환경·제약·피드백 루프 설계.",
+      "published_estimate": "추정 ~1개월 전",
+      "topics": ["프롬프트 → 컨텍스트 → 하네스 엔지니어링으로 옮겨가는 업계 흐름", "에이전트 성능은 모델이 아니라 하네스가 좌우한다는 관점"],
+      "learn": "코딩 에이전트를 들쭉날쭉하지 않게, 규모 있게 굴리는 설계 관점.",
+      "audience": "에이전트를 쓰는데 결과가 불안정한 사람",
+      "url": "https://www.youtube.com/watch?v=q1v1_btl19w"
+    }
+  ]
+}
