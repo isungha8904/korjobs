@@ -1,0 +1,110 @@
+# 디스코드 발송 워크플로 — 예약(매일 08:00 KST) + 수동(Run workflow) 겸용
+#
+# 동작:
+#   1. 대상 날짜의 broadcast/<날짜>-discord.json 이 없으면 조용히 스킵 (스케줄이 매일 돌아도 무해)
+#   2. 있으면 봇 실행 → 디스코드 승인 채널에 미리보기 + 버튼 → 승인 시 공지 채널 발송
+#   3. 발송/반려로 JSON 이 바뀌면 자동 커밋
+#
+# 필요한 사전 설정 (Settings > Secrets and variables > Actions > New repository secret):
+#   DISCORD_BOT_TOKEN / APPROVAL_CHANNEL_ID / ANNOUNCE_CHANNEL_ID (필수), APPROVER_IDS (선택)
+
+name: Discord 발송 (승인 → 공지)
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: '발송할 회차 날짜 (YYYY-MM-DD, 비우면 오늘 KST)'
+        required: false
+        type: string
+      timeout:
+        description: '승인 대기 시간(초). GitHub 작업 한도 때문에 최대 18000(5시간)'
+        required: false
+        default: '18000'
+        type: string
+      force:
+        description: '이미 발송된 회차 재발송 (--force)'
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    # 매일 08:00 KST (= UTC 23:00 전날). 페이로드 없으면 스킵되므로 매일 돌아도 안전.
+    - cron: '0 23 * * *'
+
+# 승인 세션이 겹치지 않게 동시 실행 방지
+concurrency:
+  group: discord-send
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350  # GitHub 호스티드 러너 작업 한도(6시간) 안쪽
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 날짜 결정 (입력값 또는 오늘 KST)
+        id: date
+        run: |
+          DATE="${{ inputs.date }}"
+          if [ -z "$DATE" ]; then DATE=$(TZ=Asia/Seoul date +%F); fi
+          if ! echo "$DATE" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+            echo "::error::날짜 형식이 잘못됨: $DATE (YYYY-MM-DD)"
+            exit 1
+          fi
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "대상 회차: $DATE"
+
+      - name: 페이로드 확인 (없거나 이미 발송이면 스킵)
+        id: guard
+        run: |
+          FILE="broadcast/${{ steps.date.outputs.date }}-discord.json"
+          if [ ! -f "$FILE" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::$FILE 이 없어 스킵합니다. /format-discord 로 만들어 main 에 커밋하면 다음 실행 때 발송 프로세스가 시작됩니다."
+          elif [ "$(python3 -c "import json; print(json.load(open('$FILE', encoding='utf-8')).get('status'))")" = "sent" ] && [ "${{ inputs.force }}" != "true" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::이미 발송된 회차(status: sent)라 스킵합니다. 재발송은 수동 실행에서 force 체크."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Python 준비
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 의존성 설치
+        if: steps.guard.outputs.skip != 'true'
+        run: pip install -r bot/requirements.txt
+
+      - name: 봇 실행 (디스코드 승인 대기 → 발송)
+        if: steps.guard.outputs.skip != 'true'
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          APPROVAL_CHANNEL_ID: ${{ secrets.APPROVAL_CHANNEL_ID }}
+          ANNOUNCE_CHANNEL_ID: ${{ secrets.ANNOUNCE_CHANNEL_ID }}
+          APPROVER_IDS: ${{ secrets.APPROVER_IDS }}
+        run: |
+          ARGS="${{ steps.date.outputs.date }} --timeout ${{ inputs.timeout || '18000' }}"
+          if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          python bot/send_discord.py $ARGS
+
+      - name: 발송/반려 기록 커밋
+        if: always() && steps.guard.outputs.skip != 'true'
+        run: |
+          git config user.name "korjobs-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add broadcast/
+          if git diff --cached --quiet; then
+            echo "변경 없음 — 커밋 생략"
+          else
+            git commit -m "record: ${{ steps.date.outputs.date }} discord 발송 상태 갱신 [skip ci]"
+            # 승인 대기(최대 5시간) 동안 main 에 다른 커밋이 쌓였을 수 있음
+            git pull --rebase origin main
+            git push
+          fi

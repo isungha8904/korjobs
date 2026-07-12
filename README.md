@@ -70,6 +70,16 @@ python bot/send_discord.py <날짜>         → 승인 채널에 미리보기 6�
    copy .env.example .env    ← 열어서 토큰/채널 ID 채우기
    ```
 
+### 원격/예약 실행 (GitHub Actions)
+
+로컬 PC 없이도 [.github/workflows/discord-send.yml](.github/workflows/discord-send.yml)로 발송 프로세스를 돌릴 수 있습니다:
+
+- **수동 실행**: GitHub 웹/모바일 앱 → Actions → "Discord 발송 (승인 → 공지)" → **Run workflow** (날짜 비우면 오늘 KST, force 체크 시 재발송)
+- **예약 실행**: 매일 08:00 KST 자동 실행 — 단, 그 날짜의 `broadcast/<날짜>-discord.json`이 main에 커밋돼 있을 때만 승인 요청이 올라가고, 없으면 조용히 스킵. 즉 **팀이 `/format-discord` 결과를 커밋해두면 다음날 아침 자동으로 승인 요청이 뜨는** 흐름
+- 승인은 어느 쪽이든 똑같이 디스코드 버튼으로 진행되고, 발송/반려 결과 JSON은 Actions가 자동 커밋
+- **최초 1회 설정**: 리포 Settings → Secrets and variables → Actions에 `DISCORD_BOT_TOKEN`, `APPROVAL_CHANNEL_ID`, `ANNOUNCE_CHANNEL_ID` (선택: `APPROVER_IDS`) 등록
+- ⚠️ GitHub 러너 작업 한도(6시간) 때문에 원격 실행의 승인 대기는 **최대 5시간**(기본 18000초). 시간 초과되면 다시 트리거하면 됨
+
 ### 재발송·반려·시간초과 규칙
 
 | 상황 | 동작 |
