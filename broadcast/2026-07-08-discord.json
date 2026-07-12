@@ -1,0 +1,66 @@
+{
+  "date": "2026-07-08",
+  "digest_url": "https://github.com/isungha8904/korjobs/blob/main/digests/2026-07-08.md",
+  "status": "draft",
+  "messages": [
+    {
+      "key": "top3",
+      "content": "🗞️ **IT·AI 뉴스 브리핑** · 2026-07-08(화) · 🎯 중급 개발자 + 입문자 믹스",
+      "embed": {
+        "title": "🔥 오늘의 핵심 3가지",
+        "description": "**1) 프론티어 모델 대전 재점화**\nClaude Sonnet 5가 에이전트형 코딩을 실무로 끌어내렸고(도입 특가 $2/$10 per 1M tokens, ~8/31), GPT-5.6 Sol은 Terminal-Bench 2.1 SOTA, Grok 4.5(1.5T)는 SpaceX·Tesla 사내 베타 진입.\n👉 지금 쓰는 코딩 툴의 백엔드 모델 갈아탈 타이밍.\n[Anthropic 공식 발표](https://www.anthropic.com/news/claude-sonnet-5)\n\n**2) 백악관, 3사와 '모델 출시 자율표준' 막판 조율**\n새 모델 출시 전 정부가 최대 30일 안보 검토하는 구조. 미 수출규제도 6/30 해제, 7/1부터 Fable 5 글로벌 개방.\n👉 모델 배포·리전 제약이 바뀌면 우리가 쓰는 API 가용성에 직접 영향.\n[기사(TipRanks)](https://www.tipranks.com/news/white-house-races-to-finalize-ai-model-rules-with-openai-google-and-anthropic)\n\n**3) 딥시크, '추론 특화' 자체 AI 칩 개발 착수**\n학습이 아닌 추론에 최적화 — 엔비디아·화웨이 탈피 목표, 보도에 엔비디아 주가 2%대 하락.\n👉 추론 비용은 LLM 서비스 원가의 핵심. 칩 경쟁 = 서빙 단가 하락 신호.\n[기사(한국경제)](https://www.hankyung.com/article/202607071349i)",
+        "url": "https://github.com/isungha8904/korjobs/blob/main/digests/2026-07-08.md",
+        "color": 15158332,
+        "footer": "korjobs · 2026-07-08"
+      }
+    },
+    {
+      "key": "news",
+      "embed": {
+        "title": "📰 뉴스 더보기",
+        "description": "🚀 **GPT-5.6 Sol/Terra/Luna 공개 — 일반 공개 7/9(목)**\nSol=최고 성능($5/$30), Terra=이전급 성능에 값은 절반($2.5/$15), Luna=제일 빠르고 쌈($1/$6).\n👉 \"성능 비슷 + 절반 가격\" 옵션 등장 → 같은 기능 더 싸게.\n[OpenAI 공식 발표](https://openai.com/index/previewing-gpt-5-6-sol/)\n\n🌱 **KT 에이블스쿨(AIVLE) 10기 모집 (~8/10)**\n청년 대상 무료 AI 개발자 과정(6개월, 9월 말 입교). 만 34세 이하 미취업자 대상. 수료생 3,500명이 500여 개 기업 진출.\n[공식 모집 페이지](https://aivle.kt.co.kr/)",
+        "color": 3447003,
+        "footer": "korjobs · 2026-07-08"
+      }
+    },
+    {
+      "key": "videos",
+      "embed": {
+        "title": "🎥 볼 만한 영상 (실습·튜토리얼 위주 · 최근 2주)",
+        "description": "🌱 **How to Build AI Agents in 14 minutes Using Claude** · 추정 ~3주 전 · ~14분\n- 14분 만에 Claude로 첫 에이전트 뚝딱\n- \"에이전트가 뭔지\"를 만들면서 체감\n[▶ 보기](https://www.youtube.com/watch?v=3MX7rVeVIYw)\n\n🔧 **How to Build Effective Claude Code Agents in 2026** · 추정 ~3주 전\n- 서브에이전트로 역할 분담, 도구·권한 설정\n- 데모 말고 실무에 쓸 에이전트 패턴\n[▶ 보기](https://www.youtube.com/watch?v=RzLV8sfFdMM)\n\n🔧 **요즘 판교사투리 1. \"하네스 엔지니어링\"** (한국어) · 추정 ~1개월 전\n- 프롬프트→컨텍스트 다음 화두 '하네스': 에이전트를 감싸는 환경·제약·피드백 루프\n- 에이전트 성능은 모델보다 하네스가 좌우한다는 관점\n[▶ 보기](https://www.youtube.com/watch?v=q1v1_btl19w)",
+        "color": 15105570,
+        "footer": "게시일 추정 — 배포 전 확인 · korjobs · 2026-07-08"
+      }
+    },
+    {
+      "key": "threads",
+      "embed": {
+        "title": "🧵 Threads 화제",
+        "description": "🔹 **@aiatmeta**\nMeta 공식 AI 계정. 최신 모델·연구가 가장 먼저 뜨는 곳.\n[🔗 보기](https://www.threads.com/@aiatmeta)\n\n🔹 **#AICoding 태그 (2.02억 스레드)**\n요즘 화두는 \"에이전트가 되냐?\"가 아니라 \"어떻게 매일 쓸 만하게 만드냐\" — 릴리스 파이프라인, git에 메모리 묶기 같은 실전 팁이 인기.\n[🔗 보기](https://www.threads.com/tag/AI-Coding)\n\n🔹 **Threads에 Meta AI 붙는다**\n공개 계정은 글/답글에서 @meta.ai 멘션으로 맥락·뉴스 질의 가능(Grok 유사).\n[🔗 기사](https://techcrunch.com/2026/05/12/threads-tests-a-meta-ai-integration-that-works-similarly-to-grok/)",
+        "color": 10181046,
+        "footer": "korjobs · 2026-07-08"
+      }
+    },
+    {
+      "key": "career",
+      "embed": {
+        "title": "💼 커리어·채용 시그널",
+        "description": "📌 **코딩 에이전트 성능↑ (Sonnet 5·GPT-5.6)** → 단순 API 호출을 넘어 툴 콜링·메모리·멀티에이전트 조율을 설계할 사람이 귀해짐\n▶ 배워두면 좋은 것: LangChain/에이전트 프레임워크, 툴 콜링 설계\n\n📌 **추론칩·셀프호스팅 화제** → 추론 비용 최적화 역량(LLMOps) 몸값↑\n▶ 배워두면 좋은 것: vLLM, 양자화, GPU 튜닝, 모델 서빙\n\n📌 **공공·대기업 대규모 도입** → 보안 지키며 사내 전용 LLM 배치·운영하는 AX 인력 수요\n▶ 배워두면 좋은 것: RAG, 사내 데이터 연동, 온프레미스 배포\n\n🧭 **오늘의 실무 팁:** 지금 쓰는 코딩 어시스턴트의 백엔드 모델을 Sonnet 5 / GPT-5.6 계열로 바꿔 A·B 비교 — 특가 기간에 실측해두면 팀 표준 정할 때 근거가 됩니다.",
+        "color": 3066993,
+        "footer": "korjobs · 2026-07-08"
+      }
+    },
+    {
+      "key": "glossary",
+      "embed": {
+        "title": "📖 용어 한 스푼",
+        "description": "· **추론(inference)** = 학습 끝난 AI가 실제로 답을 뱉는 단계. 여기서 서버 비용이 나옴.\n· **에이전트(agent)** = 스스로 도구를 쓰고 여러 단계를 밟아 일을 끝내는 AI.\n· **툴 콜링(tool calling)** = AI가 검색·코드 실행 같은 외부 기능을 스스로 호출하는 것.\n· **SOTA** = State-of-the-Art. 현재까지 나온 것 중 성능 1등.\n\n이번 주도 화이팅! 🚀",
+        "color": 9807270,
+        "footer": "korjobs · 2026-07-08"
+      }
+    }
+  ],
+  "edit_log": [],
+  "sent_at": null,
+  "announce_message_ids": []
+}
