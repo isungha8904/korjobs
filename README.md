@@ -14,6 +14,27 @@
 | `glossary.md` | 📖 공용 용어집 (반복 용어 정의) |
 | `templates/digest-template.md` | GitHub 마크다운 템플릿 |
 | `templates/kakao-broadcast-template.txt` | 카톡 플레인 텍스트 템플릿 |
+| `.claude/commands/*.md` | 🧩 파이프라인 컴포넌트(슬래시 커맨드) — 팀원별 담당 |
+| `data/<날짜>/*.json` | 컴포넌트 간 공유 데이터 계약 (상세: [data/SCHEMA.md](data/SCHEMA.md)) |
+
+## 🧩 컴포넌트 기반 워크플로 (팀 병렬 작업용)
+
+다이제스트 제작 과정을 6개의 독립 컴포넌트(슬래시 커맨드)로 나눴습니다. 각자 자기 컴포넌트 파일 하나(`.claude/commands/<이름>.md`)만 브랜치에서 수정하고, 산출물도 자기 담당 파일에만 씁니다 — 그래서 서로 다른 브랜치에서 동시에 작업해도 머지 충돌이 거의 없습니다.
+
+| 컴포넌트 | 담당 파일 | 입력 | 출력 |
+|---------|-----------|------|------|
+| `/curate-news` | `.claude/commands/curate-news.md` | — | `data/<날짜>/news.json` |
+| `/curate-videos` | `.claude/commands/curate-videos.md` | — | `data/<날짜>/videos.json` |
+| `/curate-threads` | `.claude/commands/curate-threads.md` | — | `data/<날짜>/threads.json` |
+| `/career-signal` | `.claude/commands/career-signal.md` | `news.json` (읽기) | `data/<날짜>/career.json` |
+| `/assemble-digest` | `.claude/commands/assemble-digest.md` | 위 4개 JSON (읽기) | `digests/<날짜>.md`, `digests/README.md` |
+| `/format-kakao` | `.claude/commands/format-kakao.md` | 위 4개 JSON (읽기) | `broadcast/<날짜>-kakao.txt` |
+
+**규칙**
+- 각 컴포넌트는 **자기 출력 파일만** 쓰고, 다른 컴포넌트의 산출물은 읽기만 합니다.
+- 컴포넌트 간 계약은 [data/SCHEMA.md](data/SCHEMA.md)에 JSON 스키마로 고정되어 있습니다. 스키마를 바꾸려면 팀 전체와 논의 후 변경하세요(다른 컴포넌트가 깨질 수 있음).
+- 브랜치 네이밍 예: `feature/curate-news`, `feature/curate-videos` — 자기 담당 `.md` 파일만 수정 후 main에 머지.
+- `assemble-digest`와 `format-kakao`는 서로 의존하지 않고 둘 다 `data/` JSON만 읽으므로 병렬 실행 가능합니다.
 
 ## 선정 원칙
 - 📈 **화제성/실용성 우선** — 영상은 실습·튜토리얼 위주(뉴스요약은 최소), 뉴스는 화제성 순
