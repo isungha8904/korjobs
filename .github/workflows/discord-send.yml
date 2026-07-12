@@ -28,8 +28,8 @@ on:
         default: false
         type: boolean
   schedule:
-    # 매일 08:00 KST (= UTC 23:00 전날). 페이로드 없으면 스킵되므로 매일 돌아도 안전.
-    - cron: '0 23 * * *'
+    # 매일 05:00 KST (= UTC 20:00 전날). 페이로드 없으면 스킵되므로 매일 돌아도 안전.
+    - cron: '0 20 * * *'
 
 # 승인 세션이 겹치지 않게 동시 실행 방지
 concurrency:
