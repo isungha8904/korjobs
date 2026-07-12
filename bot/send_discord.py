@@ -155,11 +155,69 @@ def validate(payload: dict):
 
 def parse_args():
     p = argparse.ArgumentParser(description="korjobs 디스코드 승인·발송 봇")
-    p.add_argument("date", help="발송할 회차 날짜 (YYYY-MM-DD)")
+    p.add_argument("date", nargs="?", help="발송할 회차 날짜 (YYYY-MM-DD). --list-channels 에는 불필요")
     p.add_argument("--dry-run", action="store_true", help="디스코드 연결 없이 검증 리포트만 출력")
     p.add_argument("--force", action="store_true", help="status=sent 인 회차도 재발송 허용")
     p.add_argument("--timeout", type=int, default=86400, help="승인 대기 시간(초), 기본 86400(24시간)")
+    p.add_argument("--list-channels", action="store_true",
+                   help="봇이 접근 가능한 채널과 권한(보기/발송/임베드)을 출력하고 종료 (라우팅 선택 불가 원인 확인용)")
     return p.parse_args()
+
+
+def run_list_channels():
+    """봇을 붙여 모든 길드의 채널 종류·봇 권한을 출력하는 진단 모드.
+
+    라우팅 선택기에 특정 채널이 안 뜨는 원인(봇 보기/발송 권한 없음, 포럼 등 다른 종류,
+    봇이 서버에 없음)을 실측해 드러낸다. 발송/승인 로직은 전혀 타지 않는다.
+    """
+    import discord  # noqa: E402
+    from dotenv import load_dotenv  # noqa: E402
+    import logging
+    import os
+
+    load_dotenv(REPO_ROOT / ".env")
+    token = os.getenv("DISCORD_BOT_TOKEN", "").strip()
+    if not token:
+        fail(".env 에 DISCORD_BOT_TOKEN 을 채우세요. (.env.example 참고)")
+
+    # 라우팅 선택기가 후보로 올리는 채널 종류만 검사 (텍스트·공지·포럼)
+    routable = {discord.ChannelType.text, discord.ChannelType.news, discord.ChannelType.forum}
+
+    def mark(ok: bool) -> str:
+        return "✓" if ok else "✗"
+
+    class ProbeClient(discord.Client):
+        def __init__(self):
+            super().__init__(intents=discord.Intents.default())
+            self._done = False
+
+        async def on_ready(self):
+            if self._done:
+                return
+            self._done = True
+            try:
+                if not self.guilds:
+                    print("봇이 속한 서버가 없습니다. 개발자 포털 OAuth2 URL 로 봇을 서버에 초대하세요.")
+                for guild in self.guilds:
+                    print(f"\n=== 서버: {guild.name} (id={guild.id}) ===")
+                    me = guild.me
+                    channels = [c for c in guild.channels if c.type in routable]
+                    channels.sort(key=lambda c: ((c.category.name if c.category else ""), c.position))
+                    for c in channels:
+                        perms = c.permissions_for(me)
+                        # 포럼은 send_messages 대신 create_public_threads 로 글을 올린다
+                        can_send = perms.create_public_threads if c.type is discord.ChannelType.forum else perms.send_messages
+                        cat = f"[{c.category.name}] " if c.category else ""
+                        print(f"  {cat}#{c.name}  (id={c.id}, 종류={c.type.name}, "
+                              f"봇: 보기 {mark(perms.view_channel)} · 발송 {mark(can_send)} · 임베드 {mark(perms.embed_links)})")
+            finally:
+                await self.close()
+
+    client = ProbeClient()
+    try:
+        client.run(token, log_level=logging.WARNING)
+    except discord.LoginFailure:
+        fail("봇 토큰이 잘못되었습니다. 개발자 포털 > Bot > Reset Token 으로 재발급 후 .env 를 갱신하세요.")
 
 
 def main():
@@ -169,6 +227,14 @@ def main():
         pass
 
     args = parse_args()
+
+    if args.list_channels:  # 진단 모드 — 날짜/페이로드 없이 채널 권한만 출력
+        run_list_channels()
+        sys.exit(0)
+
+    if not args.date:
+        fail("발송할 회차 날짜(YYYY-MM-DD)를 지정하세요. 예: python bot/send_discord.py 2026-07-08")
+
     path, payload = load_payload(args.date)
     if not isinstance(payload.get("edit_log"), list):
         payload["edit_log"] = []  # 봇이 기록하는 필드 — 없거나 깨져 있으면 초기화
